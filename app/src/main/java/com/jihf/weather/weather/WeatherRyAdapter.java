@@ -58,7 +58,7 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
         position--;
       }
       //这里加载数据的时候要注意，是从position-1开始，因为position==0已经被header占用了
-      holder.weather_date.setText(mList.get(position).date.length() > 2 ? mList.get(position).date.substring(0, 2) : mList.get(position).date);
+      holder.weather_date.setText((mList.get(position).date.length() > 2 ? mList.get(position).date.substring(0, 2) : mList.get(position).date) + mList.get(position).wind);
       holder.weather_desc.setText(mList.get(position).weather);
       holder.weather_temperature.setText(mList.get(position).temperature);
       Glide.with(mContext).load(mList.get(position).dayPictureUrl).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(holder.weather_pic);

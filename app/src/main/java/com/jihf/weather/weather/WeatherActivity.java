@@ -54,7 +54,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     if (!TextUtils.isEmpty(cityName) && cityName.contains("市")) {
       cityName = cityName.substring(0, cityName.length() - 1);
     }
-   setSharedPreferences(Config.SELECT_CITY, cityName);
+    setSharedPreferences(Config.SELECT_CITY, cityName);
     Log.e("ss", "getSelectCity: " + getSharedPreferences(Config.SELECT_CITY));
   }
 
@@ -161,12 +161,12 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
           String date = resultsBean.weather_data.get(0).date;
           if (!TextUtils.isEmpty(date) && date.length() > 2) {
             date = date.substring(date.length() - 3, date.length() - 1);
-            tv_current_temperature.setText(date);
+            tv_current_temperature.setText(date + "\nPM25: " + resultsBean.pm25);
           } else {
             tv_current_temperature.setText(resultsBean.pm25);
           }
           String desc = resultsBean.weather_data.get(0).weather;
-          tv_weather_desc.setText(TextUtils.isEmpty(desc) ? "晴朗" : desc);
+          tv_weather_desc.setText((TextUtils.isEmpty(desc) ? "晴朗" : desc));
         } else {
           String desc = resultsBean.weather_data.get(0).weather;
           tv_weather_desc.setText("晴朗");
