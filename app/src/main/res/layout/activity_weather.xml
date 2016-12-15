@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+  <android.support.v4.widget.SwipeRefreshLayout
+      android:id="@+id/sf_weather_root"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+    <com.jihf.weather.customview.MyScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:scrollbars="none">
+
+      <android.support.v7.widget.RecyclerView
+          android:id="@+id/ry_weather_desc"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"/>
+
+    </com.jihf.weather.customview.MyScrollView>
+  </android.support.v4.widget.SwipeRefreshLayout>
+</RelativeLayout>

@@ -1,0 +1,28 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+dependencies {
+    compile 'com.android.support:support-v4:25.0.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //umeng统计
+    compile 'com.umeng.analytics:analytics:latest.integration'
+    compile files('libs/umeng-onlineconfig_v1.0.0.jar')
+    //    // 指定下载编译百度移动统计JAR
+    //    compile 'com.baidu.mobstat:mtj-sdk:latest.integration'
+    compile files('libs/Baidu_Mtj_3.7.4.9.jar')
+}

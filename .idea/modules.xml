@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/OkHttpLib/OkHttpLib.iml" filepath="$PROJECT_DIR$/OkHttpLib/OkHttpLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WSHLocationLib_old/WSHLocationLib_old.iml" filepath="$PROJECT_DIR$/WSHLocationLib_old/WSHLocationLib_old.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WSHUMengTongJi/WSHUMengTongJi.iml" filepath="$PROJECT_DIR$/WSHUMengTongJi/WSHUMengTongJi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Weather.iml" filepath="$PROJECT_DIR$/Weather.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/indexablerecyclerview/indexablerecyclerview.iml" filepath="$PROJECT_DIR$/indexablerecyclerview/indexablerecyclerview.iml" />
+    </modules>
+  </component>
+</project>
