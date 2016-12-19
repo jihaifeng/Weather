@@ -26,7 +26,7 @@
         android:gravity="center"
         android:text="多云"
         android:textColor="@android:color/white"
-        android:textSize="30sp"
+        android:textSize="20sp"
         android:textStyle="bold"/>
 
     <TextView
@@ -39,7 +39,7 @@
         android:padding="10dp"
         android:text="苏州"
         android:textColor="@android:color/white"
-        android:textSize="20sp"/>
+        android:textSize="16sp"/>
 
     <TextView
         android:id="@+id/tv_current_temperature"
@@ -51,7 +51,7 @@
         android:gravity="center"
         android:text="4℃"
         android:textColor="@android:color/white"
-        android:textSize="50sp"/>
+        android:textSize="65sp"/>
 
     <TextView
         android:id="@+id/tv_current_pm25"
@@ -59,11 +59,15 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_current_temperature"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:background="@drawable/pm25bg"
         android:gravity="center"
-        android:padding="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
         android:text="PM25  111"
         android:textColor="@android:color/white"
-        android:textSize="13sp"/>
+        android:textSize="12sp"/>
   </RelativeLayout>
 </LinearLayout>

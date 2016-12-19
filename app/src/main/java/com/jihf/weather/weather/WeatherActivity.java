@@ -32,7 +32,6 @@ import com.jihf.weather.weather.bean.IndexBean;
 import com.jihf.weather.weather.bean.ResultsBean;
 import com.jihf.weather.weather.bean.WeatherBase;
 import com.jihf.weather.weather.bean.WeatherDataBean;
-import com.ruiyi.okhttp.OkParams;
 import java.util.List;
 
 import static com.jihf.weather.config.Config.SELECT_CITY_CODE;
@@ -45,7 +44,7 @@ import static com.jihf.weather.config.Config.SELECT_CITY_CODE;
  * Mail：jihaifeng@raiyi.com
  */
 public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
-  private OkParams okParams = new OkParams();
+
   private RecyclerView ry_weather_desc;
   private SwipeRefreshLayout sf_weather_root;
   private WeatherRyAdapter weatherRyAdapter;
@@ -60,14 +59,21 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
 
   //foot
   private TextView tv_wind;
+  private TextView tv_wind_desc;
+  private LinearLayout ll_wind;
   private TextView tv_pm25;
   private LinearLayout ll_PM25;
+  private TextView tv_temperature;
+  private LinearLayout ll_temperature;
   private View viewLine;
+  private View viewLine1;
 
   private TipsRyAdapter ryTipsAdapter;
   private RecyclerView ryTips;
   private View foot;
   private DividerGridItemDecoration dividerGridItemDecoration;
+
+  private String curTemperature = "0";
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -126,12 +132,18 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     iv_weather_bg = (ImageView) findViewById(R.id.iv_weather_bg);
     tv_current_temperature = (TextView) findViewById(R.id.tv_current_temperature);
 
-    //foot
-    tv_wind = (TextView) findViewById(R.id.tv_wind);
+    //foot1
     tv_pm25 = (TextView) findViewById(R.id.tv_pm25);
     ll_PM25 = (LinearLayout) findViewById(R.id.ll_pm25);
     viewLine = findViewById(R.id.view_Line);
+    tv_wind = (TextView) findViewById(R.id.tv_wind);
+    tv_wind_desc = (TextView) findViewById(R.id.tv_wind_desc);
+    ll_wind = (LinearLayout) findViewById(R.id.ll_wind);
+    viewLine1 = findViewById(R.id.view_Line1);
+    tv_temperature = (TextView) findViewById(R.id.tv_temperature);
+    ll_temperature = (LinearLayout) findViewById(R.id.ll_temperature);
 
+    //foot2
     ryTipsAdapter = new TipsRyAdapter(WeatherActivity.this);
     ryTips = (RecyclerView) findViewById(R.id.ry_weather_tips);
     ryTips.setLayoutManager(new GridLayoutManagerPlus(WeatherActivity.this, 3));
@@ -180,18 +192,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   private void updateFootData(List<ResultsBean> results) {
     for (ResultsBean resultsBean : results) {
       if (resultsBean.currentCity.equalsIgnoreCase(cityName)) {
-        if (TextUtils.isEmpty(resultsBean.pm25)) {
-          ll_PM25.setVisibility(View.GONE);
-          viewLine.setVisibility(View.GONE);
-        } else {
-          ll_PM25.setVisibility(View.VISIBLE);
-          viewLine.setVisibility(View.VISIBLE);
-          tv_pm25.setText(resultsBean.pm25);
-        }
-        List<WeatherDataBean> weatherDataBeen = resultsBean.weather_data;
-        if (null != weatherDataBeen && weatherDataBeen.size() != 0) {
-          tv_wind.setText(weatherDataBeen.get(0).wind);
-        }
+        updateFoot1Data(resultsBean);
         List<IndexBean> indexBeen = resultsBean.index;
         if (null != indexBeen && indexBeen.size() != 0) {
           ryTipsAdapter.updateData(indexBeen);
@@ -200,23 +201,78 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     }
   }
 
+  private void updateFoot1Data(ResultsBean resultsBean) {
+    //风力
+    List<WeatherDataBean> weatherDataBeen = resultsBean.weather_data;
+    if (null != weatherDataBeen && weatherDataBeen.size() != 0) {
+      //String windData = TextUtils.isEmpty(weatherDataBeen.get(0).wind) ? "" : weatherDataBeen.get(0).wind;
+      String windData = "东风偏北风3-5级";
+      Log.e("updateFoot1Data", "updateFoot1Data: " + windData);
+      if (TextUtils.isEmpty(windData)) {
+        ll_wind.setVisibility(View.GONE);
+        viewLine.setVisibility(View.GONE);
+      } else {
+        ll_wind.setVisibility(View.VISIBLE);
+        viewLine.setVisibility(View.VISIBLE);
+        if (windData.contains("级")) {
+          int index = windData.lastIndexOf("风");
+          String wind1 = windData.substring(0, index + 1);
+          String wind2 = windData.substring(index + 1, windData.length());
+          tv_wind.setVisibility(View.VISIBLE);
+          tv_wind_desc.setText(wind1);
+          tv_wind.setText(wind2);
+        } else {
+          tv_wind.setVisibility(View.GONE);
+          tv_wind_desc.setText(windData);
+        }
+      }
+    }
+    //温度
+    if (!TextUtils.isEmpty(curTemperature)) {
+      viewLine1.setVisibility(View.VISIBLE);
+      ll_temperature.setVisibility(View.VISIBLE);
+      tv_temperature.setText(curTemperature);
+    } else {
+      viewLine1.setVisibility(View.GONE);
+      ll_temperature.setVisibility(View.GONE);
+    }
+    //PM25
+    if (TextUtils.isEmpty(resultsBean.pm25)) {
+      if (viewLine1.getVisibility() == View.VISIBLE) {
+        viewLine1.setVisibility(View.GONE);
+      }
+      ll_PM25.setVisibility(View.GONE);
+      viewLine.setVisibility(View.GONE);
+    } else {
+      ll_PM25.setVisibility(View.VISIBLE);
+      viewLine.setVisibility(View.VISIBLE);
+      tv_pm25.setText(resultsBean.pm25);
+    }
+  }
+
   private void updateHeaderData(List<ResultsBean> results) {
     for (ResultsBean resultsBean : results) {
       if (resultsBean.currentCity.equalsIgnoreCase(cityName)) {
         tv_current_city.setText(!TextUtils.isEmpty(resultsBean.currentCity) ? resultsBean.currentCity : "北京");
-        String desc = "晴朗";
-        if (null != results && results.size() != 0 && null != resultsBean.weather_data && resultsBean.weather_data.size() != 0) {
-          String date = resultsBean.weather_data.get(0).date;
-          if (!TextUtils.isEmpty(date) && date.length() > 2) {
-            date = date.substring(date.length() - 3, date.length() - 1);
-            tv_current_temperature.setText(date);
+        String desc = "";
+        if (results.size() != 0 && null != resultsBean.weather_data && resultsBean.weather_data.size() != 0) {
+          String date = TextUtils.isEmpty(resultsBean.weather_data.get(0).date) ? "" : resultsBean.weather_data.get(0).date;
+          if (!TextUtils.isEmpty(date) && date.contains("实时")) {
+            int index = 0;
+            if (date.contains("实时：")) {
+              index = date.lastIndexOf("：");
+            } else {
+              index = date.lastIndexOf("时");
+            }
+            curTemperature = date.substring(index + 1, date.length() - 1);
+            tv_current_temperature.setText(curTemperature);
           } else {
-            tv_current_temperature.setText(resultsBean.pm25);
+            tv_current_temperature.setText("未获取到数据");
           }
           desc = resultsBean.weather_data.get(0).weather;
           tv_weather_desc.setText((TextUtils.isEmpty(desc) ? "晴朗" : desc));
         } else {
-          tv_weather_desc.setText("晴朗");
+          tv_weather_desc.setText("未获取到数据");
         }
         if (TextUtils.isEmpty(resultsBean.pm25)) {
           tv_current_pm25.setVisibility(View.GONE);
@@ -239,7 +295,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   private void updateBg(String desc, ImageView view) {
     int drawableId = 0;
     int hour = TimeUtils.getCurHour();
-    Log.e("updateBg", "updateBg: " +  hour);
+    Log.e("updateBg", "updateBg: " + hour);
     if (hour >= 18 || hour < 6) {
       //夜
       if (desc.contains("晴")) {

@@ -33,56 +33,7 @@
             android:layout_height="match_parent"
             android:background="@android:color/white"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:background="@android:color/white">
-
-          <TextView
-              android:id="@+id/tv_wind"
-              android:layout_width="0dp"
-              android:layout_height="match_parent"
-              android:layout_gravity="center_vertical"
-              android:layout_weight="1"
-              android:gravity="center"
-              android:text="aaaa"
-              android:textSize="18sp"/>
-
-          <View
-              android:id="@+id/view_Line"
-              android:layout_width="0.8dp"
-              android:layout_height="match_parent"
-              android:layout_marginBottom="5dp"
-              android:layout_marginTop="5dp"
-              android:background="@color/gray"/>
-
-          <LinearLayout
-              android:id="@+id/ll_pm25"
-              android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:layout_gravity="center_vertical"
-              android:layout_weight="1"
-              android:gravity="center_vertical"
-              android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="PM25"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15sp"/>
-
-            <TextView
-                android:id="@+id/tv_pm25"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textSize="18sp"
-                />
-          </LinearLayout>
-        </LinearLayout>
+       <include layout="@layout/weather_insert"/>
 
         <include layout="@layout/weather_foot"
             />

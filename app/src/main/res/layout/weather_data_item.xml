@@ -19,6 +19,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/text_black"
         android:text="周三"/>
 
     <RelativeLayout
@@ -38,22 +40,27 @@
           />
 
       <TextView
+          android:textColor="@color/text_gray2"
+          android:paddingLeft="5dp"
           android:id="@+id/tv_weather_desc"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_centerVertical="true"
           android:layout_toRightOf="@+id/iv_weather_pic"
           android:gravity="center"
+          android:textSize="14sp"
           android:text="多云"
           />
     </RelativeLayout>
 
     <TextView
+        android:textColor="@color/text_black"
         android:id="@+id/tv_weather_temperature"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
+        android:textSize="15sp"
         android:text="12 ~ 3℃"/>
   </LinearLayout>
 
