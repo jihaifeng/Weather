@@ -38,6 +38,10 @@ public class HttpManager {
     getAsyn(Constant.BING_PIC_URL, null, httpLinstener);
   }
 
+  public void getCity(String url, HttpLinstener httpLinstener) {
+    getAsyn(url, null, httpLinstener);
+  }
+
   public void getWeatherData(String cityName, HttpLinstener httpLinstener) {
     OkParams params = new OkParams();
     if (TextUtils.isEmpty(cityName)) {

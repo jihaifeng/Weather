@@ -35,8 +35,8 @@ public class TipsRyAdapter extends RecyclerView.Adapter<TipsRyAdapter.RytipsView
   }
 
   @Override public void onBindViewHolder(RytipsViewHolder holder, int position) {
-    holder.title.setText(mList.get(position).title + " :  " + mList.get(position).zs);
-    holder.desc.setText(mList.get(position).tipt + " :  " + mList.get(position).des);
+    holder.title.setText((mList.get(position).title.contains("指数") || mList.get(position).title.length() >= 5) ? mList.get(position).title : mList.get(position).title + "指数");
+    holder.desc.setText(mList.get(position).zs);
   }
 
   @Override public int getItemCount() {

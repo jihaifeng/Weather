@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+  <!-- 数据库名 -->
+  <dbname value="Simple_Weather"/>
+  <!-- 数据库版本 -->
+  <version value="1"/>
+  <!-- 映射模型 -->
+  <list>
+    <mapping class="com.jihf.weather.area.bean.Province"/>
+    <mapping class="com.jihf.weather.area.bean.City"/>
+    <mapping class="com.jihf.weather.area.bean.County"/>
+  </list>
+
+</litepal>
+

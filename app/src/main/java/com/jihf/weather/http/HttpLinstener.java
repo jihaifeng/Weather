@@ -1,8 +1,5 @@
 package com.jihf.weather.http;
 
-import com.jihf.weather.weather.bean.ResultsBean;
-import java.util.List;
-
 /**
  * Func：
  * User：jihf
@@ -14,6 +11,4 @@ public interface HttpLinstener {
   void onSuccess(String response);
 
   void onFailure(String msg, Throwable e);
-
-  void onSuccess(List<ResultsBean> resultsBean);
 }

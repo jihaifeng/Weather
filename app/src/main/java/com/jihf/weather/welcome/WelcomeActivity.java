@@ -8,15 +8,13 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jihf.weather.R;
-import com.jihf.weather.WeatherApplication;
 import com.jihf.weather.base.BaseActivity;
-import com.jihf.weather.city.CityPickActivity;
 import com.jihf.weather.config.Config;
 import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
-import com.jihf.weather.weather.WeatherActivity;
-import com.jihf.weather.weather.bean.ResultsBean;
-import java.util.List;
+import com.jihf.weather.main.MainActivity;
+
+//import com.jihf.weather.WeatherApplication;
 
 /**
  * Func：
@@ -43,30 +41,24 @@ public class WelcomeActivity extends BaseActivity {
       }
 
       @Override public void onFailure(String msg, Throwable e) {
-
-      }
-
-      @Override public void onSuccess(List<ResultsBean> resultsBean) {
-
+        updateWelComePic("");
       }
     });
   }
 
   private void updateWelComePic(String response) {
-    Glide.with(WelcomeActivity.this).load(response).diskCacheStrategy(DiskCacheStrategy.ALL).into(welcomePic);
+    if (TextUtils.isEmpty(response)) {
+      Glide.with(WelcomeActivity.this).load(R.drawable.timg).into(welcomePic);
+    } else {
+      Glide.with(WelcomeActivity.this).load(response).placeholder(R.drawable.timg).diskCacheStrategy(DiskCacheStrategy.ALL).into(welcomePic);
+      setSharedPreferences(Config.WELCOM_PIC, response);
+    }
     new Handler().postDelayed(new Runnable() {
       @Override public void run() {
-        WeatherApplication weatherApplication = WeatherApplication.getInstance();
-        if (!TextUtils.isEmpty(getSharedPreferences(Config.SELECT_CITY))) {
-          Bundle bundle = new Bundle();
-          bundle.putString(Config.CITY_NAME, getSharedPreferences(Config.SELECT_CITY));
-          JumpToWithBundle(WelcomeActivity.this, WeatherActivity.class, bundle);
-        } else {
-          JumpTo(WelcomeActivity.this, CityPickActivity.class);
-        }
+        JumpTo(WelcomeActivity.this, MainActivity.class);
         WelcomeActivity.this.finish();
       }
-    }, 3 * 1000);
+    }, 1 * 1000);
   }
 
   private void initView() {

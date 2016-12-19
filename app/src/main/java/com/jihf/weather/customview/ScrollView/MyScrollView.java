@@ -1,4 +1,4 @@
-package com.jihf.weather.customview;
+package com.jihf.weather.customview.ScrollView;
 
 import android.content.Context;
 import android.util.AttributeSet;

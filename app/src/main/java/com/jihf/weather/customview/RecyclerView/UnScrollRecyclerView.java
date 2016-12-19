@@ -1,4 +1,4 @@
-package com.jihf.weather.customview;
+package com.jihf.weather.customview.RecyclerView;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

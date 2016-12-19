@@ -2,16 +2,19 @@ package com.jihf.weather.base;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import com.baidu.mobstat.StatService;
 import com.jihf.weather.config.Config;
 import com.jihf.weather.utils.AppUtils;
+import com.jihf.weather.utils.ScreenUtil;
 import com.ruiyi.lib.hfb.umeng.UmengEvents;
 
 /**
@@ -27,13 +30,17 @@ public class BaseActivity extends AppCompatActivity {
   private Context mCurrentContext;
   private SharedPreferences sharedPreferences;
   public static final String APP_SP = "APP_SP";
+  private ProgressDialog progressDialog;
 
-  @Override public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-    super.onCreate(savedInstanceState, persistentState);
+  @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
     mBaseContext = this;
     UmengEvents.setChannel(this, Config.TONGJI_CHANNEL);
+    StatService.setDebugOn(true);
+    ScreenUtil.getInstance(this);
     setActivityStatus(this);
   }
+
 
   private void setActivityStatus(Activity activity) {
     //设置当前栈顶Activity
@@ -112,5 +119,26 @@ public class BaseActivity extends AppCompatActivity {
       sharedPreferences = getSharedPreferences(APP_SP, Application.MODE_PRIVATE);
     }
     return sharedPreferences.getString(key, null);
+  }
+
+  /**
+   * 显示进度对话框
+   */
+  private void showProgressDialog() {
+    if (progressDialog == null) {
+      progressDialog = new ProgressDialog(this);
+      progressDialog.setMessage("正在加载...");
+      progressDialog.setCanceledOnTouchOutside(false);
+    }
+    progressDialog.show();
+  }
+
+  /**
+   * 关闭进度对话框
+   */
+  private void closeProgressDialog() {
+    if (progressDialog != null) {
+      progressDialog.dismiss();
+    }
   }
 }

@@ -1,22 +1,32 @@
 package com.jihf.weather.weather;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
 import com.jihf.weather.R;
+import com.jihf.weather.area.AreaPickActivity;
 import com.jihf.weather.base.BaseActivity;
-import com.jihf.weather.city.CityPickActivity;
 import com.jihf.weather.config.Config;
+import com.jihf.weather.customview.RecyclerView.DividerGridItemDecoration;
+import com.jihf.weather.customview.RecyclerView.GridLayoutManagerPlus;
 import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
+import com.jihf.weather.utils.ScreenUtil;
+import com.jihf.weather.utils.TimeUtils;
 import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.weather.bean.IndexBean;
 import com.jihf.weather.weather.bean.ResultsBean;
@@ -24,6 +34,8 @@ import com.jihf.weather.weather.bean.WeatherBase;
 import com.jihf.weather.weather.bean.WeatherDataBean;
 import com.ruiyi.okhttp.OkParams;
 import java.util.List;
+
+import static com.jihf.weather.config.Config.SELECT_CITY_CODE;
 
 /**
  * Func：
@@ -38,32 +50,63 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   private SwipeRefreshLayout sf_weather_root;
   private WeatherRyAdapter weatherRyAdapter;
   private String cityName = "北京";
+  //header
+  private View header;
+  private TextView tv_weather_desc;
+  private TextView tv_current_city;
+  private TextView tv_current_temperature;
+  private TextView tv_current_pm25;
+  private ImageView iv_weather_bg;
+
+  //foot
+  private TextView tv_wind;
+  private TextView tv_pm25;
+  private LinearLayout ll_PM25;
+  private View viewLine;
+
+  private TipsRyAdapter ryTipsAdapter;
+  private RecyclerView ryTips;
+  private View foot;
+  private DividerGridItemDecoration dividerGridItemDecoration;
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_weather);
     //getSupportActionBar().setTitle("天气");
+    setItemDecoration();
     initView();
     getSelectCity();
     getWeather();
   }
 
+  private void setItemDecoration() {
+    dividerGridItemDecoration = new DividerGridItemDecoration(WeatherActivity.this, ContextCompat.getColor(WeatherActivity.this, R.color.gray));
+    dividerGridItemDecoration.setDividerHeight(ScreenUtil.dip2px((float) 0.8));
+    dividerGridItemDecoration.setDividerWidth(ScreenUtil.dip2px((float) 0.8));
+  }
+
   private void getSelectCity() {
-    Bundle bundle = getIntent().getExtras();
-    cityName = bundle.getString(Config.CITY_NAME);
-    if (!TextUtils.isEmpty(cityName) && cityName.contains("市")) {
-      cityName = cityName.substring(0, cityName.length() - 1);
-    }
-    setSharedPreferences(Config.SELECT_CITY, cityName);
+    Bundle bundle = WeatherActivity.this.getIntent().getExtras();
+    String city = bundle.getString(Config.CITY_NAME);
+    updateSelectCity(city);
     Log.e("ss", "getSelectCity: " + getSharedPreferences(Config.SELECT_CITY));
+  }
+
+  private void updateSelectCity(String city) {
+    if (!TextUtils.isEmpty(city) && city.contains("市")) {
+      city = city.substring(0, city.length() - 1);
+    }
+    cityName = city;
+    setSharedPreferences(Config.SELECT_CITY, cityName);
   }
 
   @Override public void onRefresh() {
     sf_weather_root.setRefreshing(true);
-    //getWeather();
+    getWeather();
   }
 
   private void initView() {
+    //body
     weatherRyAdapter = new WeatherRyAdapter(WeatherActivity.this);
     ry_weather_desc = (RecyclerView) findViewById(R.id.ry_weather_desc);
     ry_weather_desc.setLayoutManager(new LinearLayoutManager(WeatherActivity.this));
@@ -76,6 +119,25 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
         getWeather();
       }
     });
+    //header
+    tv_weather_desc = (TextView) findViewById(R.id.tv_weather_desc);
+    tv_current_city = (TextView) findViewById(R.id.tv_current_city);
+    tv_current_pm25 = (TextView) findViewById(R.id.tv_current_pm25);
+    iv_weather_bg = (ImageView) findViewById(R.id.iv_weather_bg);
+    tv_current_temperature = (TextView) findViewById(R.id.tv_current_temperature);
+
+    //foot
+    tv_wind = (TextView) findViewById(R.id.tv_wind);
+    tv_pm25 = (TextView) findViewById(R.id.tv_pm25);
+    ll_PM25 = (LinearLayout) findViewById(R.id.ll_pm25);
+    viewLine = findViewById(R.id.view_Line);
+
+    ryTipsAdapter = new TipsRyAdapter(WeatherActivity.this);
+    ryTips = (RecyclerView) findViewById(R.id.ry_weather_tips);
+    ryTips.setLayoutManager(new GridLayoutManagerPlus(WeatherActivity.this, 3));
+    ryTips.addItemDecoration(dividerGridItemDecoration);
+    ryTips.setHasFixedSize(true);
+    ryTips.setAdapter(ryTipsAdapter);
   }
 
   private void getWeather() {
@@ -97,11 +159,6 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
       @Override public void onFailure(String msg, Throwable e) {
         ToastUtil.showShort(WeatherActivity.this, "msg = " + msg);
       }
-
-      @Override public void onSuccess(List<ResultsBean> resultsBean) {
-        //sf_weather_root.setRefreshing(false);
-        //updateData(resultsBean);
-      }
     });
   }
 
@@ -116,71 +173,122 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
         weatherRyAdapter.updateData(weatherDataBean);
       }
     }
-    addHeadView(results, ry_weather_desc);
-    addFootView(results, ry_weather_desc);
+    updateHeaderData(results);
+    updateFootData(results);
   }
 
-  private void addFootView(List<ResultsBean> results, RecyclerView recyclerView) {
-    if (null == results || results.size() == 0) {
-      return;
-    }
-    TipsRyAdapter ryTipsAdapter;
-    RecyclerView ryTips;
-    View foot = LayoutInflater.from(WeatherActivity.this).inflate(R.layout.weather_foot, recyclerView, false);
-    ryTipsAdapter = new TipsRyAdapter(WeatherActivity.this);
-    ryTips = (RecyclerView) foot.findViewById(R.id.ry_weather_tips);
-    ryTips.setLayoutManager(new LinearLayoutManager(WeatherActivity.this));
-    ryTips.setHasFixedSize(true);
-    ryTips.setAdapter(ryTipsAdapter);
+  private void updateFootData(List<ResultsBean> results) {
     for (ResultsBean resultsBean : results) {
       if (resultsBean.currentCity.equalsIgnoreCase(cityName)) {
+        if (TextUtils.isEmpty(resultsBean.pm25)) {
+          ll_PM25.setVisibility(View.GONE);
+          viewLine.setVisibility(View.GONE);
+        } else {
+          ll_PM25.setVisibility(View.VISIBLE);
+          viewLine.setVisibility(View.VISIBLE);
+          tv_pm25.setText(resultsBean.pm25);
+        }
+        List<WeatherDataBean> weatherDataBeen = resultsBean.weather_data;
+        if (null != weatherDataBeen && weatherDataBeen.size() != 0) {
+          tv_wind.setText(weatherDataBeen.get(0).wind);
+        }
         List<IndexBean> indexBeen = resultsBean.index;
         if (null != indexBeen && indexBeen.size() != 0) {
-          weatherRyAdapter.setFooterView(foot);
           ryTipsAdapter.updateData(indexBeen);
         }
       }
     }
   }
 
-  private void addHeadView(List<ResultsBean> results, RecyclerView recyclerView) {
-    if (null == results || results.size() == 0) {
-      return;
-    }
-    TextView tv_weather_desc;
-    TextView tv_current_city;
-    TextView tv_current_temperature;
-    View header = LayoutInflater.from(WeatherActivity.this).inflate(R.layout.weather_header, recyclerView, false);
-    tv_weather_desc = (TextView) header.findViewById(R.id.tv_weather_desc);
-    tv_current_city = (TextView) header.findViewById(R.id.tv_current_city);
-    tv_current_temperature = (TextView) header.findViewById(R.id.tv_current_temperature);
+  private void updateHeaderData(List<ResultsBean> results) {
     for (ResultsBean resultsBean : results) {
       if (resultsBean.currentCity.equalsIgnoreCase(cityName)) {
         tv_current_city.setText(!TextUtils.isEmpty(resultsBean.currentCity) ? resultsBean.currentCity : "北京");
+        String desc = "晴朗";
         if (null != results && results.size() != 0 && null != resultsBean.weather_data && resultsBean.weather_data.size() != 0) {
           String date = resultsBean.weather_data.get(0).date;
           if (!TextUtils.isEmpty(date) && date.length() > 2) {
             date = date.substring(date.length() - 3, date.length() - 1);
-            tv_current_temperature.setText(date + "\nPM25: " + resultsBean.pm25);
+            tv_current_temperature.setText(date);
           } else {
             tv_current_temperature.setText(resultsBean.pm25);
           }
-          String desc = resultsBean.weather_data.get(0).weather;
+          desc = resultsBean.weather_data.get(0).weather;
           tv_weather_desc.setText((TextUtils.isEmpty(desc) ? "晴朗" : desc));
         } else {
-          String desc = resultsBean.weather_data.get(0).weather;
           tv_weather_desc.setText("晴朗");
-          tv_current_temperature.setText(resultsBean.pm25);
         }
-
+        if (TextUtils.isEmpty(resultsBean.pm25)) {
+          tv_current_pm25.setVisibility(View.GONE);
+        } else {
+          tv_current_pm25.setVisibility(View.VISIBLE);
+          tv_current_pm25.setText("PM25  " + resultsBean.pm25);
+        }
         tv_current_city.setOnClickListener(new View.OnClickListener() {
           @Override public void onClick(View view) {
-            JumpTo(WeatherActivity.this, CityPickActivity.class);
+            Intent intent = new Intent();
+            intent.setClass(WeatherActivity.this, AreaPickActivity.class);
+            startActivityForResult(intent, SELECT_CITY_CODE);
           }
         });
+        updateBg(desc, iv_weather_bg);
       }
     }
-    weatherRyAdapter.setHeaderView(header);
+  }
+
+  private void updateBg(String desc, ImageView view) {
+    int drawableId = 0;
+    int hour = TimeUtils.getCurHour();
+    Log.e("updateBg", "updateBg: " +  hour);
+    if (hour >= 18 || hour < 6) {
+      //夜
+      if (desc.contains("晴")) {
+        drawableId = R.drawable.weather_night_sun;
+      } else if (desc.contains("雨")) {
+        drawableId = R.drawable.weather_night_rain;
+      } else if (desc.contains("雪")) {
+        drawableId = R.drawable.weather_night_snow;
+      }
+    } else {
+      //昼
+      if (desc.contains("晴")) {
+        drawableId = R.drawable.weather_day_sun;
+      } else if (desc.contains("雨")) {
+        drawableId = R.drawable.weather_day_rain;
+      } else if (desc.contains("雪")) {
+        drawableId = R.drawable.weather_day_snow;
+      }
+    }
+    if (drawableId == 0) {
+      Glide.with(WeatherActivity.this).load(TextUtils.isEmpty(getSharedPreferences(Config.WELCOM_PIC)) ? "" : getSharedPreferences(Config.WELCOM_PIC)).diskCacheStrategy(DiskCacheStrategy.ALL).into(view);
+    } else {
+      Glide.with(WeatherActivity.this).load(drawableId).diskCacheStrategy(DiskCacheStrategy.ALL).into(view);
+    }
+  }
+
+  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (resultCode != Activity.RESULT_OK || data == null) {
+      return;
+    }
+    switch (requestCode) {
+      case Config.SELECT_CITY_CODE:
+        String city = data.getStringExtra(Config.CITY_NAME);
+        updateSelectCity(city);
+        getWeather();
+        break;
+    }
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+  }
+
+  @Override protected void onPause() {
+    super.onPause();
+  }
+
+  @Override protected void onDestroy() {
+    super.onDestroy();
   }
 }
 

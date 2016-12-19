@@ -4,10 +4,18 @@
     android:layout_height="wrap_content">
 
   <RelativeLayout
+
       android:layout_width="match_parent"
-      android:layout_height="300dp"
+      android:layout_height="400dp"
       android:layout_weight="3"
-      android:background="@color/colorPrimary">
+      >
+
+    <ImageView
+        android:id="@+id/iv_weather_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:scaleType="fitXY"/>
 
     <TextView
         android:id="@+id/tv_weather_desc"
@@ -16,10 +24,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="45dp"
         android:gravity="center"
-        android:padding="10dp"
         android:text="多云"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="30sp"
         android:textStyle="bold"/>
 
     <TextView
@@ -32,7 +39,7 @@
         android:padding="10dp"
         android:text="苏州"
         android:textColor="@android:color/white"
-        android:textSize="16sp"/>
+        android:textSize="20sp"/>
 
     <TextView
         android:id="@+id/tv_current_temperature"
@@ -40,11 +47,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_current_city"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:gravity="center"
-        android:padding="10dp"
-        android:text="实时：4℃"
+        android:text="4℃"
         android:textColor="@android:color/white"
-        android:textSize="25sp"/>
+        android:textSize="50sp"/>
+
+    <TextView
+        android:id="@+id/tv_current_pm25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_current_temperature"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/pm25bg"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="PM25  111"
+        android:textColor="@android:color/white"
+        android:textSize="13sp"/>
   </RelativeLayout>
 </LinearLayout>

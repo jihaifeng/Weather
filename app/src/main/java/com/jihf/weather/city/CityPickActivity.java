@@ -67,10 +67,18 @@ public class CityPickActivity extends BaseActivity implements ActivityCompat.OnR
     // set Listener
     adapter.setOnItemContentClickListener(new IndexableAdapter.OnItemContentClickListener<CityEntity>() {
       @Override public void onItemClick(View v, int originalPosition, int currentPosition, CityEntity entity) {
-        Bundle bundle = new Bundle();
-        bundle.putString(Config.CITY_NAME, entity.getName());
-        JumpToWithBundle(CityPickActivity.this, WeatherActivity.class,bundle);
-        CityPickActivity.this.finish();
+        if (entity.getName().equalsIgnoreCase("定位失败")){
+          if (ActivityCompat.checkSelfPermission(CityPickActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(CityPickActivity.this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, Config.PERMISSION_LOCATION);
+          } else {
+            startLocation();
+          }
+        }else {
+          Bundle bundle = new Bundle();
+          bundle.putString(Config.CITY_NAME, entity.getName());
+          JumpToWithBundle(CityPickActivity.this, WeatherActivity.class, bundle);
+          CityPickActivity.this.finish();
+        }
       }
     });
 

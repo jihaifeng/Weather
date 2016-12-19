@@ -20,4 +20,8 @@ public class Config {
 
   public static final int PERMISSION_LOCATION = 100;
   public static final String SELECT_CITY = "select_cityname";
+  public static final int SELECT_CITY_CODE = 1000;
+
+  public static final String FROM_WEATHER = "from_weather";
+  public static final String WELCOM_PIC = "welcom_pic";
 }
