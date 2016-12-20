@@ -90,6 +90,13 @@ public class AppUtils {
     activityStack.clear();
   }
 
+  public int getActivityNum() {
+    if (null != activityStack){
+      return activityStack.size();
+    }
+    return 0;
+  }
+
   public void AppExit(Context context) {
     try {
       finishAllActivity();

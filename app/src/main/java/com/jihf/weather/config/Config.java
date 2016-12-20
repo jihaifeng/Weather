@@ -24,4 +24,11 @@ public class Config {
 
   public static final String FROM_WEATHER = "from_weather";
   public static final String WELCOM_PIC = "welcom_pic";
+  //指数
+  public static final String WEATHER_DRESS = "穿衣";
+  public static final String WEATHER_CATCHACOLD = "感冒";
+  public static final String WEATHER_UV = "紫外线";
+  public static final String WEATHER_MOVEMENT = "运动";
+  public static final String WEATHER_TOURISM = "旅游";
+  public static final String WEATHER_WASHCAR = "洗车";
 }

@@ -25,7 +25,7 @@ import com.ruiyi.lib.hfb.umeng.UmengEvents;
  * Mail：jihaifeng@raiyi.com
  */
 public class BaseActivity extends AppCompatActivity {
-  private static String TAG = BaseActivity.class.getSimpleName().trim();
+  public static String TAG = BaseActivity.class.getSimpleName().trim();
   private Context mBaseContext;
   private Context mCurrentContext;
   private SharedPreferences sharedPreferences;
@@ -36,11 +36,10 @@ public class BaseActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     mBaseContext = this;
     UmengEvents.setChannel(this, Config.TONGJI_CHANNEL);
-    StatService.setDebugOn(true);
+    StatService.setDebugOn(false);
     ScreenUtil.getInstance(this);
     setActivityStatus(this);
   }
-
 
   private void setActivityStatus(Activity activity) {
     //设置当前栈顶Activity
@@ -49,8 +48,19 @@ public class BaseActivity extends AppCompatActivity {
     activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     // 向Acitivty栈（数据类型为List）中添加Activity
     AppUtils.getInstance().addActivity(activity);
+
     //设置TAG
     TAG = activity.getClass().getSimpleName().trim();
+  }
+
+  @Override public void finish() {
+    super.finish();
+    Log.i(TAG, "-------finish------");
+    AppUtils.getInstance().removeActivity(this);
+  }
+
+  public static boolean canGoBack() {
+    return AppUtils.getInstance().getActivityNum() > 1;
   }
 
   public Context getCurrentActivity() {
@@ -124,7 +134,7 @@ public class BaseActivity extends AppCompatActivity {
   /**
    * 显示进度对话框
    */
-  private void showProgressDialog() {
+  public void showProgressDialog() {
     if (progressDialog == null) {
       progressDialog = new ProgressDialog(this);
       progressDialog.setMessage("正在加载...");
@@ -136,7 +146,7 @@ public class BaseActivity extends AppCompatActivity {
   /**
    * 关闭进度对话框
    */
-  private void closeProgressDialog() {
+  public void hideProgressDialog() {
     if (progressDialog != null) {
       progressDialog.dismiss();
     }

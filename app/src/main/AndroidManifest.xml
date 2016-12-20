@@ -55,6 +55,11 @@
         android:launchMode="singleTask"
         android:screenOrientation="portrait"
         />
+    <activity
+        android:name=".weather.AddWeatherCityActivity"
+        android:launchMode="singleTask"
+        android:screenOrientation="portrait"
+        />
     <!--**********************************百度统计配置====开始****************************************-->
     <!-- 您从百度网站获取的APP KEY -->
     <meta-data
