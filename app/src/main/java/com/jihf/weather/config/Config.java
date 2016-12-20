@@ -8,7 +8,6 @@ package com.jihf.weather.config;
  * Mail：jihaifeng@raiyi.com
  */
 public class Config {
-  public static final String CITY_NAME = "cityName";
   public static final String TONGJI_CHANNEL = "BaiduMobAd_CHANNEL";
   public static final String JUHE_KEY = "25c32e75bce37c7a76d5a12b98b38fbe";
   public static final String BAIDU_WEATHER_AK = "7ijwY8TLZEW57f8dUGfkcNp3QaC2nQqc";
@@ -18,8 +17,9 @@ public class Config {
    */
   public static final String REGEX_PHONENUMBER = "^1[3|4|5|6|7|8|9][0-9]{9}$";
 
-  public static final int PERMISSION_LOCATION = 100;
-  public static final String SELECT_CITY = "select_cityname";
+  public static final String CITY_NAME_INTENT = "city_name";
+  public static final String CURRENT_CITY_NAME = "current_city_name";
+  public static final String SELECT_CITY_LIST = "select_city_list";
   public static final int SELECT_CITY_CODE = 1000;
 
   public static final String FROM_WEATHER = "from_weather";

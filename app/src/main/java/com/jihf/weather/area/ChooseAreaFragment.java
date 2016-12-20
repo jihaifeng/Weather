@@ -105,12 +105,12 @@ public class ChooseAreaFragment extends Fragment {
           String weatherId = countyList.get(position).getCountyName();
           if (getActivity() instanceof AreaPickActivity) {
             Intent intent = new Intent(getActivity(), WeatherActivity.class);
-            intent.putExtra(Config.CITY_NAME, weatherId);
+            intent.putExtra(Config.CITY_NAME_INTENT, weatherId);
             getActivity().setResult(RESULT_OK, intent);
             getActivity().finish();
           } else if (getActivity() instanceof MainActivity) {
             Bundle bundle = new Bundle();
-            bundle.putString(Config.CITY_NAME, weatherId);
+            bundle.putString(Config.CITY_NAME_INTENT, weatherId);
             Intent intent = new Intent(getActivity(), WeatherActivity.class);
             intent.putExtras(bundle);
             startActivity(intent);

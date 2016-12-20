@@ -1,11 +1,15 @@
 package com.jihf.weather.weather;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,12 +30,14 @@ import com.jihf.weather.R;
 import com.jihf.weather.area.AreaPickActivity;
 import com.jihf.weather.base.BaseActivity;
 import com.jihf.weather.config.Config;
+import com.jihf.weather.config.PermissionConfig;
 import com.jihf.weather.customview.RecyclerView.DividerGridItemDecoration;
 import com.jihf.weather.customview.RecyclerView.GridLayoutManagerPlus;
 import com.jihf.weather.customview.ScrollView.MyScrollView;
 import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
 import com.jihf.weather.utils.AppUtils;
+import com.jihf.weather.utils.CityUtils;
 import com.jihf.weather.utils.ScreenUtil;
 import com.jihf.weather.utils.TimeUtils;
 import com.jihf.weather.utils.ToastUtil;
@@ -39,6 +45,7 @@ import com.jihf.weather.weather.bean.IndexBean;
 import com.jihf.weather.weather.bean.ResultsBean;
 import com.jihf.weather.weather.bean.WeatherBase;
 import com.jihf.weather.weather.bean.WeatherDataBean;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jihf.weather.config.Config.SELECT_CITY_CODE;
@@ -57,6 +64,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   private SwipeRefreshLayout sf_weather_root;
   private WeatherRyAdapter weatherRyAdapter;
   private String cityName = "北京";
+  private List<String> cityList;
   //toolbar
   private RelativeLayout weatherBack;
   private RelativeLayout weatherMore;
@@ -140,9 +148,8 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
 
   private void getSelectCity() {
     Bundle bundle = WeatherActivity.this.getIntent().getExtras();
-    String city = bundle.getString(Config.CITY_NAME);
+    String city = bundle.getString(Config.CITY_NAME_INTENT);
     updateSelectCity(city);
-    Log.e("ss", "getSelectCity: " + getSharedPreferences(Config.SELECT_CITY));
   }
 
   private void updateSelectCity(String city) {
@@ -150,7 +157,19 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
       city = city.substring(0, city.length() - 1);
     }
     cityName = city;
-    setSharedPreferences(Config.SELECT_CITY, cityName);
+    setSharedPreferences(Config.CURRENT_CITY_NAME, cityName);
+    cityList = CityUtils.getCityList();
+    if (null == cityList) {
+      cityList = new ArrayList<>();
+    }
+    if (!cityList.contains(cityName)) {
+      cityList.add(cityName);
+    }
+    if (ContextCompat.checkSelfPermission(WeatherActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+      ActivityCompat.requestPermissions(WeatherActivity.this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, PermissionConfig.WRITE_SETTINGS);
+    } else {
+      CityUtils.insertCityList(cityList);
+    }
   }
 
   @Override public void onRefresh() {
@@ -170,7 +189,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     weatherMore = (RelativeLayout) findViewById(R.id.rl_more);
     weatherMore.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        JumpTo(WeatherActivity.this,AddWeatherCityActivity.class);
+        JumpTo(WeatherActivity.this, AddWeatherCityActivity.class);
       }
     });
     //body
@@ -242,7 +261,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
       showProgressDialog();
       pullDown = false;
     }
-    HttpManager.getInstance(WeatherActivity.this).getWeatherData(cityName, new HttpLinstener() {
+    HttpManager.getInstance(WeatherActivity.this).getWeatherData(CityUtils.getCityStr(), new HttpLinstener() {
       @Override public void onSuccess(String response) {
         sf_weather_root.setRefreshing(false);
         if (TextUtils.isEmpty(response)) {
@@ -425,10 +444,21 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     }
     switch (requestCode) {
       case Config.SELECT_CITY_CODE:
-        String city = data.getStringExtra(Config.CITY_NAME);
+        String city = data.getStringExtra(Config.CITY_NAME_INTENT);
         updateSelectCity(city);
         getWeather();
         break;
+    }
+  }
+
+  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    if (requestCode == PermissionConfig.WRITE_SETTINGS) {
+      if (grantResults.length > 0) {
+        CityUtils.insertCityList(cityList);
+      } else {
+        ActivityCompat.shouldShowRequestPermissionRationale(WeatherActivity.this,Manifest.permission.WRITE_SETTINGS);
+        ToastUtil.showShort(WeatherActivity.this, "缺少必要权限权限。。。");
+      }
     }
   }
 

@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 import com.jihf.weather.R;
 import com.jihf.weather.base.BaseActivity;
 import com.jihf.weather.config.Config;
+import com.jihf.weather.config.PermissionConfig;
 import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.weather.WeatherActivity;
 import com.raiyi.wsh_lib_bdlocation.mgr.AddressListener;
@@ -69,13 +70,13 @@ public class CityPickActivity extends BaseActivity implements ActivityCompat.OnR
       @Override public void onItemClick(View v, int originalPosition, int currentPosition, CityEntity entity) {
         if (entity.getName().equalsIgnoreCase("定位失败")){
           if (ActivityCompat.checkSelfPermission(CityPickActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(CityPickActivity.this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, Config.PERMISSION_LOCATION);
+            ActivityCompat.requestPermissions(CityPickActivity.this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, PermissionConfig.PERMISSION_LOCATION);
           } else {
             startLocation();
           }
         }else {
           Bundle bundle = new Bundle();
-          bundle.putString(Config.CITY_NAME, entity.getName());
+          bundle.putString(Config.CITY_NAME_INTENT, entity.getName());
           JumpToWithBundle(CityPickActivity.this, WeatherActivity.class, bundle);
           CityPickActivity.this.finish();
         }
@@ -97,7 +98,7 @@ public class CityPickActivity extends BaseActivity implements ActivityCompat.OnR
     gpsHeaderAdapter = new SimpleHeaderAdapter<>(adapter, "定", "当前城市", gpsCity);
     indexableLayout.addHeaderAdapter(gpsHeaderAdapter);
     if (ActivityCompat.checkSelfPermission(CityPickActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-      ActivityCompat.requestPermissions(CityPickActivity.this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, Config.PERMISSION_LOCATION);
+      ActivityCompat.requestPermissions(CityPickActivity.this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, PermissionConfig.PERMISSION_LOCATION);
     } else {
       startLocation();
     }
@@ -172,7 +173,7 @@ public class CityPickActivity extends BaseActivity implements ActivityCompat.OnR
   }
 
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-    if (requestCode == Config.PERMISSION_LOCATION) {
+    if (requestCode == PermissionConfig.PERMISSION_LOCATION) {
       if (grantResults.length > 0) {
         startLocation();
       } else {

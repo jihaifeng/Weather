@@ -82,7 +82,7 @@ public class SearchFragment extends Fragment {
 
     public void JumpTo(String cityName) {
       Bundle bundle = new Bundle();
-      bundle.putString(Config.CITY_NAME, cityName);
+      bundle.putString(Config.CITY_NAME_INTENT, cityName);
       Intent intent = new Intent();
       intent.putExtras(bundle);
       intent.setClass(getActivity(), WeatherActivity.class);
