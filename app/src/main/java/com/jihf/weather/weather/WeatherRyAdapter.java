@@ -2,6 +2,7 @@ package com.jihf.weather.weather;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jihf.weather.R;
+import com.jihf.weather.utils.TimeUtils;
 import com.jihf.weather.weather.bean.WeatherDataBean;
 import java.util.List;
 
@@ -60,9 +62,124 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
       //这里加载数据的时候要注意，是从position-1开始，因为position==0已经被header占用了
       holder.weather_date.setText((mList.get(position).date.length() > 2 ? mList.get(position).date.substring(0, 2) : mList.get(position).date));
       holder.weather_desc.setText(mList.get(position).weather);
-      holder.weather_temperature.setText(mList.get(position).temperature.replace("~","/"));
-      Glide.with(mContext).load(mList.get(position).dayPictureUrl).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(holder.weather_pic);
+      holder.weather_temperature.setText(mList.get(position).temperature.replace("~", "/"));
+      int drawableId = getDrawableId(mList.get(position).weather);
+      Glide.with(mContext).load(drawableId).error(R.drawable.weather_icon_nonetwork).into(holder.weather_pic);
     }
+  }
+
+  private int getDrawableId(String weather) {
+    int drawableId = R.drawable.weather_icon_nonetwork;
+    int hour = TimeUtils.getCurHour();
+    Log.e("updateBg", "updateBg: " + hour);
+    if (6 < hour && hour < 18) {
+      //昼
+      if (weather.contains("晴") && !weather.contains("阴") && !weather.contains("多云")) {
+        //晴天
+        drawableId = R.drawable.weather_icon_sun;
+      } else if (weather.contains("晴") && weather.contains("阴") && !weather.contains("多云")) {
+        //阴转晴，晴转阴
+        drawableId = R.drawable.weather_icon_cloudturnsun;
+      } else if (weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
+        //多云转晴，晴转多云
+        //drawableId = R.drawable.weather_night_snow;
+      } else if (!weather.contains("晴") && weather.contains("阴") && weather.contains("多云")) {
+        //多云转阴，阴转多云
+        //drawableId = R.drawable.weather_night_snow;
+      }
+    } else {
+      //夜
+      if (weather.contains("晴") && !weather.contains("阴") && !weather.contains("多云")) {
+        //晴天
+        drawableId = R.drawable.weather_icon_moon;
+      } else if (weather.contains("晴") && weather.contains("阴") && !weather.contains("多云")) {
+        //阴转晴，晴转阴
+        drawableId = R.drawable.weather_icon_cloudturnmoon;
+      } else if (weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
+        //多云转晴，晴转多云
+        //drawableId = R.drawable.weather_night_snow;
+      } else if (!weather.contains("晴") && weather.contains("阴") && weather.contains("多云")) {
+        //多云转阴，阴转多云
+        //drawableId = R.drawable.weather_night_snow;
+      }
+    }
+    if (!weather.contains("晴") && weather.contains("阴") && !weather.contains("多云")) {
+      //阴天
+      drawableId = R.drawable.weather_icon_cloudy;
+    }
+    if (!weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
+      //多云
+      drawableId = R.drawable.weather_icon_cloud;
+    }
+    if (weather.contains("小雨")) {
+      //小雨
+      drawableId = R.drawable.weather_icon_lightrain;
+    }
+    if (weather.contains("中雨")) {
+      //中雨
+      drawableId = R.drawable.weather_icon_moderaterain;
+    }
+    if (weather.contains("大雨")) {
+      //大雨
+      drawableId = R.drawable.weather_icon_heavyrain;
+    }
+    if (weather.contains("暴雨")) {
+      //暴雨
+      drawableId = R.drawable.weather_icon_heavyrains;
+    }
+    if (weather.contains("雷阵雨")) {
+      //雷阵雨
+      drawableId = R.drawable.weather_icon_thunderstorm;
+    }
+    if (weather.contains("小雪")) {
+      //小雪
+      drawableId = R.drawable.weather_icon_lightsnow;
+    }
+    if (weather.contains("中雪")) {
+      //中雪
+      drawableId = R.drawable.weather_icon_moderatesnow;
+    }
+    if (weather.contains("大雪")) {
+      //大雪
+      drawableId = R.drawable.weather_icon_heavysnow;
+    }
+    if (weather.contains("暴雪")) {
+      //暴雪
+      drawableId = R.drawable.weather_icon_blizzard;
+    }
+    if (weather.contains("雨夹雪")) {
+      //雨夹雪
+      drawableId = R.drawable.weather_icon_sleet;
+    }
+    if (weather.contains("冰雹")) {
+      //冰雹
+      drawableId = R.drawable.weather_icon_hail;
+    }
+    if (weather.contains("彩虹")) {
+      //彩虹
+      drawableId = R.drawable.weather_icon_rainbow;
+    }
+    if (weather.contains("沙尘暴")) {
+      //沙尘暴
+      drawableId = R.drawable.weather_icon_duststorms;
+    }
+    if (weather.contains("雾")) {
+      //雾
+      drawableId = R.drawable.weather_icon_fog;
+    }
+    if (weather.contains("霾")) {
+      //霾
+      drawableId = R.drawable.weather_icon_haze;
+    }
+    if (weather.contains("火山")) {
+      //火山
+      drawableId = R.drawable.weather_icon_volcano;
+    }
+    if (weather.contains("龙卷风")) {
+      //龙卷风
+      drawableId = R.drawable.weather_icon_tornado;
+    }
+    return drawableId;
   }
 
   @Override public int getItemCount() {
@@ -133,6 +250,7 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
     mFooterView = footerView;
     notifyItemInserted(getItemCount() - 1);
   }
+
   private boolean isHeaderView(int position) {
     return (mHeaderView != null) && (position == 0);
   }
