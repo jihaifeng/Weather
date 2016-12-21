@@ -13,8 +13,8 @@
       android:layout_height="match_parent">
 
     <com.jihf.weather.customview.ScrollView.MyScrollView
-        android:layout_width="match_parent"
         android:id="@+id/sl_root"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:orientation="vertical"
@@ -83,9 +83,18 @@
               />
         </LinearLayout>
       </RelativeLayout>
+
     </com.jihf.weather.customview.ScrollView.MyScrollView>
 
   </android.support.v4.widget.SwipeRefreshLayout>
+
+  <android.support.design.widget.CoordinatorLayout
+      android:id="@+id/cl_root"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="@android:color/transparent"
+      android:orientation="vertical">
+  </android.support.design.widget.CoordinatorLayout>
 
   <include
       layout="@layout/weather_title"

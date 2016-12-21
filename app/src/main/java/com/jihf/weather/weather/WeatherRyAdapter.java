@@ -82,10 +82,10 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
         drawableId = R.drawable.weather_icon_cloudturnsun;
       } else if (weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
         //多云转晴，晴转多云
-        //drawableId = R.drawable.weather_night_snow;
+        drawableId = R.drawable.weather_icon_sunturncloud;
       } else if (!weather.contains("晴") && weather.contains("阴") && weather.contains("多云")) {
         //多云转阴，阴转多云
-        //drawableId = R.drawable.weather_night_snow;
+        drawableId = R.drawable.weather_icon_sunturncloud;
       }
     } else {
       //夜
@@ -97,10 +97,10 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
         drawableId = R.drawable.weather_icon_cloudturnmoon;
       } else if (weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
         //多云转晴，晴转多云
-        //drawableId = R.drawable.weather_night_snow;
+        drawableId = R.drawable.weather_icon_moonturncloud;
       } else if (!weather.contains("晴") && weather.contains("阴") && weather.contains("多云")) {
         //多云转阴，阴转多云
-        //drawableId = R.drawable.weather_night_snow;
+        drawableId = R.drawable.weather_icon_moonturncloud;
       }
     }
     if (!weather.contains("晴") && weather.contains("阴") && !weather.contains("多云")) {
