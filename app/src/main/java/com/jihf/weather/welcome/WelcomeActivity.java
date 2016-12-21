@@ -1,5 +1,6 @@
 package com.jihf.weather.welcome;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -13,6 +14,7 @@ import com.jihf.weather.config.Config;
 import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
 import com.jihf.weather.main.MainActivity;
+import com.jihf.weather.utils.CustomStatusBar;
 
 //import com.jihf.weather.WeatherApplication;
 
@@ -29,6 +31,7 @@ public class WelcomeActivity extends BaseActivity {
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_welcome);
+    CustomStatusBar.setTranslucentForPic(this, Color.TRANSPARENT,false,false);
     initView();
     getWelcomePic();
     //updateWelComePic("");

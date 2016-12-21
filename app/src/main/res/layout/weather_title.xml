@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tb_title"
     android:layout_width="match_parent"
-    android:layout_height="45dp"
+    android:layout_height="@dimen/toolbar_height"
     android:background="@android:color/transparent"
     android:orientation="horizontal"
+    android:paddingTop="@dimen/toolbar_padding_top"
     app:contentInsetLeft="0dp"
-    app:contentInsetStart="0dp">
+    app:contentInsetStart="0dp"
+    >
 
   <RelativeLayout
       android:id="@+id/rl_back"

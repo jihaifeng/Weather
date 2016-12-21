@@ -38,6 +38,7 @@ import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
 import com.jihf.weather.utils.AppUtils;
 import com.jihf.weather.utils.CityUtils;
+import com.jihf.weather.utils.CustomStatusBar;
 import com.jihf.weather.utils.ScreenUtil;
 import com.jihf.weather.utils.TimeUtils;
 import com.jihf.weather.utils.ToastUtil;
@@ -110,13 +111,14 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     toolbar = (Toolbar) findViewById(R.id.tb_title);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle("");
-    Log.i(TAG, "onCreate: " + AppUtils.getInstance().getActivityNum());
+    CustomStatusBar.setTranslucent(this,Color.TRANSPARENT,false,toolbar);
     setItemDecoration();
     initView();
     updateViewVisibility(false);
     getSelectCity();
     getWeather();
   }
+
 
   private void updateViewVisibility(boolean isShow) {
     ll_weather_root.setVisibility(isShow ? View.VISIBLE : View.GONE);
@@ -165,7 +167,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     if (!cityList.contains(cityName)) {
       cityList.add(cityName);
     }
-    if (ContextCompat.checkSelfPermission(WeatherActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+    if (ContextCompat.checkSelfPermission(WeatherActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
       ActivityCompat.requestPermissions(WeatherActivity.this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, PermissionConfig.WRITE_SETTINGS);
     } else {
       CityUtils.insertCityList(cityList);
@@ -456,7 +458,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
       if (grantResults.length > 0) {
         CityUtils.insertCityList(cityList);
       } else {
-        ActivityCompat.shouldShowRequestPermissionRationale(WeatherActivity.this,Manifest.permission.WRITE_SETTINGS);
+        ActivityCompat.shouldShowRequestPermissionRationale(WeatherActivity.this, Manifest.permission.WRITE_SETTINGS);
         ToastUtil.showShort(WeatherActivity.this, "缺少必要权限权限。。。");
       }
     }

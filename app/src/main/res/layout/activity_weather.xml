@@ -4,12 +4,13 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray"
+    android:background="@android:color/transparent"
     >
 
   <android.support.v4.widget.SwipeRefreshLayout
       android:id="@+id/sf_weather_root"
       android:layout_width="match_parent"
+      android:background="@color/gray"
       android:layout_height="match_parent">
 
     <com.jihf.weather.customview.ScrollView.MyScrollView
