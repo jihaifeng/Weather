@@ -1,15 +1,23 @@
 package com.jihf.weather.area;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,14 +26,19 @@ import com.jihf.weather.area.bean.City;
 import com.jihf.weather.area.bean.County;
 import com.jihf.weather.area.bean.Province;
 import com.jihf.weather.config.Config;
+import com.jihf.weather.config.PermissionConfig;
 import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
 import com.jihf.weather.main.MainActivity;
 import com.jihf.weather.utils.CityUtils;
+import com.jihf.weather.utils.DrawableUtils;
 import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.utils.Utility;
 import com.jihf.weather.weather.CityManagerActivity;
 import com.jihf.weather.weather.WeatherActivity;
+import com.raiyi.wsh_lib_bdlocation.mgr.AddressListener;
+import com.raiyi.wsh_lib_bdlocation.mgr.LocationMgr;
+import com.raiyi.wsh_lib_bdlocation.mgr.bean.AddressItem;
 import java.util.ArrayList;
 import java.util.List;
 import org.litepal.crud.DataSupport;
@@ -45,6 +58,11 @@ public class ChooseAreaFragment extends Fragment {
   private ProgressDialog progressDialog;
 
   private TextView titleText;
+  //location
+  private static TextView tv_ocation;
+  private static LinearLayout ll_Location;
+  private static ProgressBar pb_location;
+  private static ImageView iv_location;
 
   private RelativeLayout rl_back;
   private RelativeLayout rl_more;
@@ -85,16 +103,79 @@ public class ChooseAreaFragment extends Fragment {
    */
   private int currentLevel;
 
+  private String strLocation = "定位中。。。";
+
+  private static Context mContext;
+
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.choose_area, container, false);
+    mContext = getActivity();
+    initView(view);
+    getLocationAddr();
+    adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
+    listView.setAdapter(adapter);
+    return view;
+  }
+
+  private void initView(View view) {
     titleText = (TextView) view.findViewById(R.id.toolbar_title);
     rl_back = (RelativeLayout) view.findViewById(R.id.rl_back);
     rl_more = (RelativeLayout) view.findViewById(R.id.rl_more);
     rl_more.setVisibility(View.GONE);
     listView = (ListView) view.findViewById(R.id.list_view);
-    adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
-    listView.setAdapter(adapter);
-    return view;
+    tv_ocation = (TextView) view.findViewById(R.id.tv_location);
+    ll_Location = (LinearLayout) view.findViewById(R.id.ll_location);
+    pb_location = (ProgressBar) view.findViewById(R.id.pb_location_refresh);
+    iv_location = (ImageView) view.findViewById(R.id.iv_location_refresh);
+    tv_ocation.setText("定位中。。。");
+    pb_location.setVisibility(View.VISIBLE);
+    iv_location.setVisibility(View.GONE);
+    iv_location.setImageDrawable(DrawableUtils.tintDrawable(getActivity(), R.drawable.location_refresh, R.color.gray));
+    ll_Location.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        if (tv_ocation.getText().toString().contains("定位失败")) {
+          getLocationAddr();
+        } else {
+          doNext(tv_ocation.getText().toString());
+        }
+      }
+    });
+  }
+
+  private void getLocationAddr() {
+    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+      ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, PermissionConfig.PERMISSION_LOCATION);
+    } else {
+      startLocation();
+    }
+  }
+
+  public static void startLocation() {
+    // 定位
+    tv_ocation.setText("定位中。。。");
+    pb_location.setVisibility(View.VISIBLE);
+    iv_location.setVisibility(View.GONE);
+    LocationMgr.getInstance(mContext, "all").locationAddress(new AddressListener() {
+      @Override public void getAddress(AddressItem address) {
+        if (address == null || TextUtils.isEmpty(address.getAddress())) {
+          tv_ocation.setText("定位失败 (点击刷新) ");
+          pb_location.setVisibility(View.GONE);
+          iv_location.setVisibility(View.VISIBLE);
+        } else {
+          pb_location.setVisibility(View.GONE);
+          iv_location.setVisibility(View.GONE);
+          if (!TextUtils.isEmpty(address.getDistrict())) {
+            //区,县
+            tv_ocation.setText(address.getDistrict());
+          } else if (!TextUtils.isEmpty(address.getCity())) {
+            //市
+            tv_ocation.setText(address.getCity());
+          } else {
+            tv_ocation.setText("定位失败,位置信息不全 (点击刷新) ");
+          }
+        }
+      }
+    });
   }
 
   @Override public void onActivityCreated(Bundle savedInstanceState) {
@@ -109,23 +190,7 @@ public class ChooseAreaFragment extends Fragment {
           queryCounties();
         } else if (currentLevel == LEVEL_COUNTY) {
           String weatherId = countyList.get(position).getCountyName();
-          if (getActivity() instanceof AreaPickActivity) {
-            if (CityUtils.getCityList().contains(weatherId)) {
-              ToastUtil.showShort(getActivity(), "该地区正在关注中不可重复添加哦。。。");
-            } else {
-              Intent intent = new Intent(getActivity(), CityManagerActivity.class);
-              intent.putExtra(Config.CITY_NAME_INTENT, weatherId);
-              getActivity().setResult(RESULT_OK, intent);
-              getActivity().finish();
-            }
-          } else if (getActivity() instanceof MainActivity) {
-            Bundle bundle = new Bundle();
-            bundle.putString(Config.CITY_NAME_INTENT, weatherId);
-            Intent intent = new Intent(getActivity(), WeatherActivity.class);
-            intent.putExtras(bundle);
-            startActivity(intent);
-            getActivity().finish();
-          }
+          doNext(weatherId);
         }
       }
     });
@@ -141,6 +206,26 @@ public class ChooseAreaFragment extends Fragment {
       }
     });
     queryProvinces();
+  }
+
+  private void doNext(String weatherId) {
+    if (getActivity() instanceof AreaPickActivity) {
+      if (CityUtils.getCityList().contains(weatherId)) {
+        ToastUtil.showShort(getActivity(), "该地区正在关注中不可重复添加哦。。。");
+      } else {
+        Intent intent = new Intent(getActivity(), CityManagerActivity.class);
+        intent.putExtra(Config.CITY_NAME_INTENT, weatherId);
+        getActivity().setResult(RESULT_OK, intent);
+        getActivity().finish();
+      }
+    } else if (getActivity() instanceof MainActivity) {
+      Bundle bundle = new Bundle();
+      bundle.putString(Config.CITY_NAME_INTENT, weatherId);
+      Intent intent = new Intent(getActivity(), WeatherActivity.class);
+      intent.putExtras(bundle);
+      startActivity(intent);
+      getActivity().finish();
+    }
   }
 
   /**

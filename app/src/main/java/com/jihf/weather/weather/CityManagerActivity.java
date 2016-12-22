@@ -150,9 +150,6 @@ public class CityManagerActivity extends BaseActivity {
   }
 
   private void updateSelectCity(String city) {
-    if (!TextUtils.isEmpty(city) && city.contains("市")) {
-      city = city.substring(0, city.length() - 1);
-    }
     cityName = city;
     setSharedPreferences(Config.CURRENT_CITY_NAME, cityName);
     cityList = CityUtils.getCityList();
