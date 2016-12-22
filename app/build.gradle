@@ -54,4 +54,6 @@ dependencies {
   compile 'com.tencent.bugly:nativecrashreport:latest.release'
   //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
   compile files('libs/androidsvg-1.2.0.jar')
+  /*多功能recyclerview*/
+  compile 'com.yanzhenjie:recyclerview-swipe:1.0.2'
 }

@@ -65,7 +65,7 @@ public class HttpManager {
       @Override public void onFailure(Request request, Exception e) {
         Log.i(TAG, "onFailure: 请求失败 = " + request.toString());
         if (null != httpLinstener) {
-          httpLinstener.onFailure(request.toString(), e);
+          httpLinstener.onFailure("数据加载失败，请检查网络后重试。。。", e);
         }
       }
 
@@ -75,17 +75,6 @@ public class HttpManager {
           httpLinstener.onFailure("数据返回出错，请稍后重试", null);
           return;
         }
-        //WeatherBase weatherBase = new Gson().fromJson(response, WeatherBase.class);
-        //if (null == weatherBase) {
-        //  httpLinstener.onFailure("数据解析出错，请稍后重试", null);
-        //  return;
-        //}
-        //if (weatherBase.error != 0) {
-        //  httpLinstener.onFailure(weatherBase.status, null);
-        //}
-        //if (!TextUtils.isEmpty(weatherBase.status) && weatherBase.status.equalsIgnoreCase("success") && null != weatherBase.results) {
-        //  httpLinstener.onSuccess(weatherBase.results);
-        //}
         if (null != httpLinstener) {
           httpLinstener.onSuccess(response);
         }

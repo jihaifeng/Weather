@@ -1,22 +1,17 @@
 package com.jihf.weather.weather;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,26 +20,20 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.gson.Gson;
 import com.jihf.weather.R;
-import com.jihf.weather.area.AreaPickActivity;
 import com.jihf.weather.base.BaseActivity;
 import com.jihf.weather.config.Config;
-import com.jihf.weather.config.PermissionConfig;
 import com.jihf.weather.customview.RecyclerView.DividerGridItemDecoration;
 import com.jihf.weather.customview.RecyclerView.GridLayoutManagerPlus;
 import com.jihf.weather.customview.ScrollView.MyScrollView;
-import com.jihf.weather.http.HttpLinstener;
-import com.jihf.weather.http.HttpManager;
-import com.jihf.weather.utils.AppUtils;
+import com.jihf.weather.http.WeatherLinstener;
 import com.jihf.weather.utils.CityUtils;
 import com.jihf.weather.utils.CustomStatusBar;
 import com.jihf.weather.utils.ScreenUtil;
-import com.jihf.weather.utils.TimeUtils;
 import com.jihf.weather.utils.ToastUtil;
+import com.jihf.weather.utils.WeatherUtils;
 import com.jihf.weather.weather.bean.IndexBean;
 import com.jihf.weather.weather.bean.ResultsBean;
-import com.jihf.weather.weather.bean.WeatherBase;
 import com.jihf.weather.weather.bean.WeatherDataBean;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +100,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     toolbar = (Toolbar) findViewById(R.id.tb_title);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle("");
-    CustomStatusBar.setTranslucent(this,Color.TRANSPARENT,false,toolbar);
+    CustomStatusBar.setTranslucent(this, Color.TRANSPARENT, false, toolbar);
     setItemDecoration();
     initView();
     updateViewVisibility(false);
@@ -119,13 +108,12 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     getWeather();
   }
 
-
   private void updateViewVisibility(boolean isShow) {
     ll_weather_root.setVisibility(isShow ? View.VISIBLE : View.GONE);
     rlLoading.setVisibility(View.GONE);
   }
 
-  private void showError(String s) {
+  private void showErrorView(String s) {
     pullDown = false;
     hideProgressDialog();
     if (TextUtils.isEmpty(s)) {
@@ -135,6 +123,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     tv_error.setVisibility(View.VISIBLE);
     ll_weather_root.setVisibility(View.GONE);
     tv_error.setText(s);
+    toolbar.setBackgroundColor(ContextCompat.getColor(WeatherActivity.this, R.color.half_transparent));
     ivRefresh.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
         getWeather();
@@ -167,11 +156,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     if (!cityList.contains(cityName)) {
       cityList.add(cityName);
     }
-    if (ContextCompat.checkSelfPermission(WeatherActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-      ActivityCompat.requestPermissions(WeatherActivity.this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, PermissionConfig.WRITE_SETTINGS);
-    } else {
-      CityUtils.insertCityList(cityList);
-    }
+    CityUtils.insertCityList(cityList);
   }
 
   @Override public void onRefresh() {
@@ -191,7 +176,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     weatherMore = (RelativeLayout) findViewById(R.id.rl_more);
     weatherMore.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        JumpTo(WeatherActivity.this, AddWeatherCityActivity.class);
+        startActivityForResult(new Intent(WeatherActivity.this, CityManagerActivity.class), SELECT_CITY_CODE);
       }
     });
     //body
@@ -258,44 +243,28 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   }
 
   private void getWeather() {
-    Log.i(TAG, "getWeather: " + AppUtils.getInstance().getActivityNum());
-    if (!pullDown) {
-      showProgressDialog();
-      pullDown = false;
-    }
-    HttpManager.getInstance(WeatherActivity.this).getWeatherData(CityUtils.getCityStr(), new HttpLinstener() {
-      @Override public void onSuccess(String response) {
+    WeatherUtils.getWeather(WeatherActivity.this, pullDown, new WeatherLinstener() {
+      @Override public void showError(String msg) {
         sf_weather_root.setRefreshing(false);
-        if (TextUtils.isEmpty(response)) {
-          showError("数据返回出错，请稍后重试");
-          ToastUtil.showShort(WeatherActivity.this, "数据返回出错，请稍后重试");
-          return;
-        }
-        WeatherBase weatherBase = new Gson().fromJson(response, WeatherBase.class);
-        if (null == weatherBase) {
-          showError("数据返回出错，请稍后重试");
-          ToastUtil.showShort(WeatherActivity.this, "数据解析出错，请稍后重试");
-          return;
-        }
-        updateData(weatherBase.results);
+        showErrorView(msg);
+        ToastUtil.showShort(WeatherActivity.this, TextUtils.isEmpty(msg) ? "数据异常" : msg);
       }
 
-      @Override public void onFailure(String msg, Throwable e) {
-        showError(msg);
+      @Override public void showData(List<ResultsBean> results) {
         sf_weather_root.setRefreshing(false);
-        ToastUtil.showShort(WeatherActivity.this, "msg = " + msg);
+        updateData(results);
       }
     });
   }
 
   private void updateData(List<ResultsBean> results) {
+    toolbar.setBackgroundColor(ContextCompat.getColor(WeatherActivity.this, R.color.transparent));
     pullDown = false;
     if (null == results || results.size() == 0) {
-      showError("数据出错，请稍后重试");
+      showErrorView("数据出错，请稍后重试");
       ToastUtil.showShort(WeatherActivity.this, "数据出错...");
       return;
     }
-    hideProgressDialog();
     updateViewVisibility(true);
     for (ResultsBean resultsBean : results) {
       if (resultsBean.currentCity.equalsIgnoreCase(cityName)) {
@@ -398,45 +367,8 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
           tv_current_pm25.setVisibility(View.VISIBLE);
           tv_current_pm25.setText("PM2.5  " + resultsBean.pm25);
         }
-        tv_current_city.setOnClickListener(new View.OnClickListener() {
-          @Override public void onClick(View view) {
-            Intent intent = new Intent();
-            intent.setClass(WeatherActivity.this, AreaPickActivity.class);
-            startActivityForResult(intent, SELECT_CITY_CODE);
-          }
-        });
-        updateBg(desc, iv_weather_bg);
+        Glide.with(WeatherActivity.this).load(WeatherUtils.getWeatherBg(desc)).diskCacheStrategy(DiskCacheStrategy.ALL).into(iv_weather_bg);
       }
-    }
-  }
-
-  private void updateBg(String desc, ImageView view) {
-    int drawableId = 0;
-    int hour = TimeUtils.getCurHour();
-    Log.e("updateBg", "updateBg: " + hour);
-    if (hour >= 18 || hour < 6) {
-      //夜
-      if (desc.contains("晴")) {
-        drawableId = R.drawable.weather_night_sun;
-      } else if (desc.contains("雨")) {
-        drawableId = R.drawable.weather_night_rain;
-      } else if (desc.contains("雪")) {
-        drawableId = R.drawable.weather_night_snow;
-      }
-    } else {
-      //昼
-      if (desc.contains("晴")) {
-        drawableId = R.drawable.weather_day_sun;
-      } else if (desc.contains("雨")) {
-        drawableId = R.drawable.weather_day_rain;
-      } else if (desc.contains("雪")) {
-        drawableId = R.drawable.weather_day_snow;
-      }
-    }
-    if (drawableId == 0) {
-      Glide.with(WeatherActivity.this).load(TextUtils.isEmpty(getSharedPreferences(Config.WELCOM_PIC)) ? "" : getSharedPreferences(Config.WELCOM_PIC)).diskCacheStrategy(DiskCacheStrategy.ALL).into(view);
-    } else {
-      Glide.with(WeatherActivity.this).load(drawableId).diskCacheStrategy(DiskCacheStrategy.ALL).into(view);
     }
   }
 
@@ -450,17 +382,6 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
         updateSelectCity(city);
         getWeather();
         break;
-    }
-  }
-
-  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-    if (requestCode == PermissionConfig.WRITE_SETTINGS) {
-      if (grantResults.length > 0) {
-        CityUtils.insertCityList(cityList);
-      } else {
-        ActivityCompat.shouldShowRequestPermissionRationale(WeatherActivity.this, Manifest.permission.WRITE_SETTINGS);
-        ToastUtil.showShort(WeatherActivity.this, "缺少必要权限权限。。。");
-      }
     }
   }
 

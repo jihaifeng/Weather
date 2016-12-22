@@ -55,7 +55,7 @@
         android:screenOrientation="portrait"
         />
     <activity
-        android:name=".weather.AddWeatherCityActivity"
+        android:name=".weather.CityManagerActivity"
         android:launchMode="singleTask"
         android:screenOrientation="portrait"
         />

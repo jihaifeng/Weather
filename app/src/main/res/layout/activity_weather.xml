@@ -10,14 +10,15 @@
   <android.support.v4.widget.SwipeRefreshLayout
       android:id="@+id/sf_weather_root"
       android:layout_width="match_parent"
-      android:background="@color/gray"
-      android:layout_height="match_parent">
+      android:layout_height="match_parent"
+      android:background="@color/gray">
 
     <com.jihf.weather.customview.ScrollView.MyScrollView
         android:id="@+id/sl_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
+        android:fillViewport="true"
         android:orientation="vertical"
         android:scrollbars="none">
 
@@ -34,7 +35,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_marginTop="200dp"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
@@ -46,7 +46,9 @@
               android:background="@drawable/weather_refresh"/>
 
           <TextView
+              android:layout_marginTop="20dp"
               android:id="@+id/tv_error"
+              android:gravity="center"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"/>
 

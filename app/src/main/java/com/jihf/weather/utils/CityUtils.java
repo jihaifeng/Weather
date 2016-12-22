@@ -22,7 +22,6 @@ public class CityUtils {
       return new ArrayList<>();
     }
     String cityData = getCityStr();
-    Log.i(TAG, "getCityList: " + cityData);
     return stringToList(cityData);
   }
 
@@ -32,7 +31,6 @@ public class CityUtils {
       return null;
     }
     String cityData = datas.get(0).content;
-    Log.i(TAG, "getCityList: " + cityData);
     return cityData;
   }
 
@@ -42,6 +40,18 @@ public class CityUtils {
     }
     Log.i(TAG, "insertCityList: " + cityList.size());
     return BaseDbData.insert(Config.SELECT_CITY_LIST, listToString(cityList));
+  }
+
+  public static int delete(String str) {
+    if (TextUtils.isEmpty(str)) {
+      return 0;
+    }
+    List<String> cityList = CityUtils.getCityList();
+    if (cityList.contains(str)) {
+      cityList.remove(str);
+    }
+    Log.i(TAG, "delete: " +cityList);
+    return BaseDbData.update(Config.SELECT_CITY_LIST, listToString(cityList));
   }
 
   public static List<String> stringToList(String key) {

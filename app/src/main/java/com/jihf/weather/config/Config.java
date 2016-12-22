@@ -21,6 +21,7 @@ public class Config {
   public static final String CURRENT_CITY_NAME = "current_city_name";
   public static final String SELECT_CITY_LIST = "select_city_list";
   public static final int SELECT_CITY_CODE = 1000;
+  public static final int ADD_CITY_CODE = 999;
 
   public static final String FROM_WEATHER = "from_weather";
   public static final String WELCOM_PIC = "welcom_pic";

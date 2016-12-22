@@ -4,38 +4,52 @@
     android:id="@+id/tb_title"
     android:layout_width="match_parent"
     android:layout_height="@dimen/toolbar_height"
-    android:background="@android:color/transparent"
+    android:background="@color/transparent"
     android:orientation="horizontal"
     android:paddingTop="@dimen/toolbar_padding_top"
     app:contentInsetLeft="0dp"
     app:contentInsetStart="0dp"
     >
 
-  <RelativeLayout
-      android:id="@+id/rl_back"
-      android:layout_width="50dp"
-      android:layout_height="match_parent">
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="12dp"
-        android:background="@drawable/weather_general_back"/>
-  </RelativeLayout>
-
-  <RelativeLayout
-      android:id="@+id/rl_more"
-      android:layout_width="50dp"
+  <FrameLayout
+      android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_gravity="end"
-      android:gravity="end">
+      android:orientation="horizontal">
 
-    <ImageView
+    <RelativeLayout
+        android:id="@+id/rl_back"
+        android:layout_width="50dp"
+        android:layout_height="match_parent">
+
+      <ImageView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_centerVertical="true"
+          android:layout_marginLeft="12dp"
+          android:background="@drawable/weather_general_back"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/toolbar_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="12dp"
-        android:background="@drawable/weather_more"/>
-  </RelativeLayout>
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@android:color/white"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_more"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:gravity="end">
+
+      <ImageView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_centerVertical="true"
+          android:layout_marginRight="12dp"
+          android:background="@drawable/weather_more"/>
+    </RelativeLayout>
+  </FrameLayout>
 </android.support.v7.widget.Toolbar>

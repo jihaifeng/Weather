@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.jihf.weather.R;
@@ -21,7 +21,10 @@ import com.jihf.weather.config.Config;
 import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
 import com.jihf.weather.main.MainActivity;
+import com.jihf.weather.utils.CityUtils;
+import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.utils.Utility;
+import com.jihf.weather.weather.CityManagerActivity;
 import com.jihf.weather.weather.WeatherActivity;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +46,8 @@ public class ChooseAreaFragment extends Fragment {
 
   private TextView titleText;
 
-  private Button backButton;
+  private RelativeLayout rl_back;
+  private RelativeLayout rl_more;
 
   private ListView listView;
 
@@ -83,8 +87,10 @@ public class ChooseAreaFragment extends Fragment {
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.choose_area, container, false);
-    titleText = (TextView) view.findViewById(R.id.title_text);
-    backButton = (Button) view.findViewById(R.id.back_button);
+    titleText = (TextView) view.findViewById(R.id.toolbar_title);
+    rl_back = (RelativeLayout) view.findViewById(R.id.rl_back);
+    rl_more = (RelativeLayout) view.findViewById(R.id.rl_more);
+    rl_more.setVisibility(View.GONE);
     listView = (ListView) view.findViewById(R.id.list_view);
     adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
     listView.setAdapter(adapter);
@@ -104,10 +110,14 @@ public class ChooseAreaFragment extends Fragment {
         } else if (currentLevel == LEVEL_COUNTY) {
           String weatherId = countyList.get(position).getCountyName();
           if (getActivity() instanceof AreaPickActivity) {
-            Intent intent = new Intent(getActivity(), WeatherActivity.class);
-            intent.putExtra(Config.CITY_NAME_INTENT, weatherId);
-            getActivity().setResult(RESULT_OK, intent);
-            getActivity().finish();
+            if (CityUtils.getCityList().contains(weatherId)) {
+              ToastUtil.showShort(getActivity(), "该地区正在关注中不可重复添加哦。。。");
+            } else {
+              Intent intent = new Intent(getActivity(), CityManagerActivity.class);
+              intent.putExtra(Config.CITY_NAME_INTENT, weatherId);
+              getActivity().setResult(RESULT_OK, intent);
+              getActivity().finish();
+            }
           } else if (getActivity() instanceof MainActivity) {
             Bundle bundle = new Bundle();
             bundle.putString(Config.CITY_NAME_INTENT, weatherId);
@@ -119,12 +129,14 @@ public class ChooseAreaFragment extends Fragment {
         }
       }
     });
-    backButton.setOnClickListener(new View.OnClickListener() {
+    rl_back.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         if (currentLevel == LEVEL_COUNTY) {
           queryCities();
         } else if (currentLevel == LEVEL_CITY) {
           queryProvinces();
+        } else {
+          getActivity().finish();
         }
       }
     });
@@ -136,7 +148,9 @@ public class ChooseAreaFragment extends Fragment {
    */
   private void queryProvinces() {
     titleText.setText("中国");
-    backButton.setVisibility(View.GONE);
+    if (getActivity() instanceof MainActivity) {
+      rl_back.setVisibility(View.GONE);
+    }
     provinceList = DataSupport.findAll(Province.class);
     if (provinceList.size() > 0) {
       dataList.clear();
@@ -157,7 +171,7 @@ public class ChooseAreaFragment extends Fragment {
    */
   private void queryCities() {
     titleText.setText(selectedProvince.getProvinceName());
-    backButton.setVisibility(View.VISIBLE);
+    rl_back.setVisibility(View.VISIBLE);
     cityList = DataSupport.where("provinceid = ?", String.valueOf(selectedProvince.getId())).find(City.class);
     if (cityList.size() > 0) {
       dataList.clear();
@@ -179,7 +193,7 @@ public class ChooseAreaFragment extends Fragment {
    */
   private void queryCounties() {
     titleText.setText(selectedCity.getCityName());
-    backButton.setVisibility(View.VISIBLE);
+    rl_back.setVisibility(View.VISIBLE);
     countyList = DataSupport.where("cityid = ?", String.valueOf(selectedCity.getId())).find(County.class);
     if (countyList.size() > 0) {
       dataList.clear();

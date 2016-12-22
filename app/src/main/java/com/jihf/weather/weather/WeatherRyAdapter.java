@@ -1,18 +1,26 @@
 package com.jihf.weather.weather;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jihf.weather.R;
-import com.jihf.weather.utils.TimeUtils;
+import com.jihf.weather.config.Config;
+import com.jihf.weather.utils.CityUtils;
+import com.jihf.weather.utils.WeatherUtils;
+import com.jihf.weather.weather.bean.ResultsBean;
 import com.jihf.weather.weather.bean.WeatherDataBean;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenuAdapter;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Func：
@@ -21,7 +29,7 @@ import java.util.List;
  * Time: 11:03
  * Mail：jihaifeng@raiyi.com
  */
-public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.WeatherHolder> {
+public class WeatherRyAdapter extends SwipeMenuAdapter<WeatherRyAdapter.WeatherHolder> {
 
   public static final int TYPE_HEADER = 0;  //说明是带有Header的
   public static final int TYPE_FOOTER = 1;  //说明是带有Footer的
@@ -31,6 +39,7 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
   private View mHeaderView;
   private View mFooterView;
   private List<WeatherDataBean> mList;
+  private List<ResultsBean> beanList;
 
   private Context mContext;
 
@@ -38,152 +47,100 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
     this.mContext = mContext;
   }
 
+  public void updateResultsData(List<ResultsBean> list) {
+    if (null == list || list.size() == 0) {
+      return;
+    }
+    this.beanList = list;
+    notifyDataSetChanged();
+  }
+
   public void updateData(List<WeatherDataBean> list) {
+    if (null == list || list.size() == 0) {
+      return;
+    }
     this.mList = list;
     notifyDataSetChanged();
   }
 
-  @Override public WeatherHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  @Override public View onCreateContentView(ViewGroup parent, int viewType) {
+    if (mHeaderView != null && viewType == TYPE_HEADER) {
+      return mHeaderView;
+    }
+    if (mFooterView != null && viewType == TYPE_FOOTER) {
+      return mFooterView;
+    }
+    return LayoutInflater.from(mContext).inflate(R.layout.weather_data_item, parent, false);
+  }
+
+  @Override public WeatherHolder onCompatCreateViewHolder(View realContentView, int viewType) {
     if (mHeaderView != null && viewType == TYPE_HEADER) {
       return new WeatherHolder(mHeaderView);
     }
     if (mFooterView != null && viewType == TYPE_FOOTER) {
       return new WeatherHolder(mFooterView);
     }
-    return new WeatherHolder(LayoutInflater.from(mContext).inflate(R.layout.weather_data_item, parent, false));
+    return new WeatherHolder(realContentView);
   }
+
+  //@Override public WeatherHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  //  if (mHeaderView != null && viewType == TYPE_HEADER) {
+  //    return new WeatherHolder(mHeaderView);
+  //  }
+  //  if (mFooterView != null && viewType == TYPE_FOOTER) {
+  //    return new WeatherHolder(mFooterView);
+  //  }
+  //  return new WeatherHolder(LayoutInflater.from(mContext).inflate(R.layout.weather_data_item, parent, false));
+  //}
 
   @Override public void onBindViewHolder(WeatherHolder holder, int position) {
 
-    if (null != mList && !isHeaderView(position) && !isFooterView(position)) {
+    if ((null != mList || null != beanList) && !isHeaderView(position) && !isFooterView(position)) {
       if (mHeaderView != null) {
         position--;
       }
-      //这里加载数据的时候要注意，是从position-1开始，因为position==0已经被header占用了
-      holder.weather_date.setText((mList.get(position).date.length() > 2 ? mList.get(position).date.substring(0, 2) : mList.get(position).date));
-      holder.weather_desc.setText(mList.get(position).weather);
-      holder.weather_temperature.setText(mList.get(position).temperature.replace("~", "/"));
-      int drawableId = getDrawableId(mList.get(position).weather);
-      Glide.with(mContext).load(drawableId).error(R.drawable.weather_icon_nonetwork).into(holder.weather_pic);
-    }
-  }
-
-  private int getDrawableId(String weather) {
-    int drawableId = R.drawable.weather_icon_nonetwork;
-    int hour = TimeUtils.getCurHour();
-    Log.e("updateBg", "updateBg: " + hour);
-    if (6 < hour && hour < 18) {
-      //昼
-      if (weather.contains("晴") && !weather.contains("阴") && !weather.contains("多云")) {
-        //晴天
-        drawableId = R.drawable.weather_icon_sun;
-      } else if (weather.contains("晴") && weather.contains("阴") && !weather.contains("多云")) {
-        //阴转晴，晴转阴
-        drawableId = R.drawable.weather_icon_cloudturnsun;
-      } else if (weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
-        //多云转晴，晴转多云
-        drawableId = R.drawable.weather_icon_sunturncloud;
-      } else if (!weather.contains("晴") && weather.contains("阴") && weather.contains("多云")) {
-        //多云转阴，阴转多云
-        drawableId = R.drawable.weather_icon_sunturncloud;
+      String str = "";
+      WeatherDataBean weatherDataBean = null;
+      if (mContext instanceof WeatherActivity) {
+        str = (mList.get(position).date.length() > 2 ? mList.get(position).date.substring(0, 2) : mList.get(position).date);
+        if (null != mList.get(position)) {
+          weatherDataBean = mList.get(position);
+        }
+        holder.view_Line.setVisibility(View.GONE);
+      } else if (mContext instanceof CityManagerActivity) {
+        str = beanList.get(position).currentCity;
+        if (null != beanList.get(position) && null != beanList.get(position).weather_data && beanList.get(position).weather_data.size() != 0) {
+          weatherDataBean = beanList.get(position).weather_data.get(0);
+        }
+        holder.view_Line.setVisibility(View.VISIBLE);
+        final String finalStr = str;
+        holder.ll_weather.setOnClickListener(new View.OnClickListener() {
+          @Override public void onClick(View view) {
+            Intent intent = new Intent(mContext, WeatherActivity.class);
+            intent.putExtra(Config.CITY_NAME_INTENT, finalStr);
+            ((CityManagerActivity) mContext).setResult(RESULT_OK, intent);
+            ((CityManagerActivity) mContext).finish();
+          }
+        });
       }
-    } else {
-      //夜
-      if (weather.contains("晴") && !weather.contains("阴") && !weather.contains("多云")) {
-        //晴天
-        drawableId = R.drawable.weather_icon_moon;
-      } else if (weather.contains("晴") && weather.contains("阴") && !weather.contains("多云")) {
-        //阴转晴，晴转阴
-        drawableId = R.drawable.weather_icon_cloudturnmoon;
-      } else if (weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
-        //多云转晴，晴转多云
-        drawableId = R.drawable.weather_icon_moonturncloud;
-      } else if (!weather.contains("晴") && weather.contains("阴") && weather.contains("多云")) {
-        //多云转阴，阴转多云
-        drawableId = R.drawable.weather_icon_moonturncloud;
+      if (null != weatherDataBean) {
+        //这里加载数据的时候要注意，是从position-1开始，因为position==0已经被header占用了
+        holder.weather_date.setText(str);
+        holder.weather_desc.setText(weatherDataBean.weather);
+        holder.weather_temperature.setText(weatherDataBean.temperature.replace("~", "/"));
+        int drawableId = WeatherUtils.getWeatherIcon(weatherDataBean.weather);
+        Glide.with(mContext).load(drawableId).error(R.drawable.weather_icon_nonetwork).into(holder.weather_pic);
       }
     }
-    if (!weather.contains("晴") && weather.contains("阴") && !weather.contains("多云")) {
-      //阴天
-      drawableId = R.drawable.weather_icon_cloudy;
-    }
-    if (!weather.contains("晴") && !weather.contains("阴") && weather.contains("多云")) {
-      //多云
-      drawableId = R.drawable.weather_icon_cloud;
-    }
-    if (weather.startsWith("小雨")) {
-      //小雨
-      drawableId = R.drawable.weather_icon_lightrain;
-    }
-    if (weather.startsWith("中雨")) {
-      //中雨
-      drawableId = R.drawable.weather_icon_moderaterain;
-    }
-    if (weather.startsWith("大雨")) {
-      //大雨
-      drawableId = R.drawable.weather_icon_heavyrain;
-    }
-    if (weather.startsWith("暴雨")) {
-      //暴雨
-      drawableId = R.drawable.weather_icon_heavyrains;
-    }
-    if (weather.startsWith("雷阵雨")) {
-      //雷阵雨
-      drawableId = R.drawable.weather_icon_thunderstorm;
-    }
-    if (weather.startsWith("小雪")) {
-      //小雪
-      drawableId = R.drawable.weather_icon_lightsnow;
-    }
-    if (weather.startsWith("中雪")) {
-      //中雪
-      drawableId = R.drawable.weather_icon_moderatesnow;
-    }
-    if (weather.startsWith("大雪")) {
-      //大雪
-      drawableId = R.drawable.weather_icon_heavysnow;
-    }
-    if (weather.startsWith("暴雪")) {
-      //暴雪
-      drawableId = R.drawable.weather_icon_blizzard;
-    }
-    if (weather.startsWith("雨夹雪")) {
-      //雨夹雪
-      drawableId = R.drawable.weather_icon_sleet;
-    }
-    if (weather.startsWith("冰雹")) {
-      //冰雹
-      drawableId = R.drawable.weather_icon_hail;
-    }
-    if (weather.startsWith("彩虹")) {
-      //彩虹
-      drawableId = R.drawable.weather_icon_rainbow;
-    }
-    if (weather.startsWith("沙尘暴")) {
-      //沙尘暴
-      drawableId = R.drawable.weather_icon_duststorms;
-    }
-    if (weather.startsWith("雾")) {
-      //雾
-      drawableId = R.drawable.weather_icon_fog;
-    }
-    if (weather.startsWith("霾")) {
-      //霾
-      drawableId = R.drawable.weather_icon_haze;
-    }
-    if (weather.startsWith("火山")) {
-      //火山
-      drawableId = R.drawable.weather_icon_volcano;
-    }
-    if (weather.startsWith("龙卷风")) {
-      //龙卷风
-      drawableId = R.drawable.weather_icon_tornado;
-    }
-    return drawableId;
   }
 
   @Override public int getItemCount() {
-    int count = (mList == null ? 0 : mList.size());
+    int count = 0;
+    if (mContext instanceof WeatherActivity) {
+      count = (mList == null ? 0 : mList.size());
+    } else if (mContext instanceof CityManagerActivity) {
+      count = (beanList == null ? 0 : beanList.size());
+    }
     if (mHeaderView != null) {
       count++;
     }
@@ -194,11 +151,23 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
     return count;
   }
 
+  public void removeData(int adapterPosition) {
+    String str = beanList.get(adapterPosition).currentCity;
+    Log.i("CityUtils", "removeData: " + str);
+    if (mContext instanceof CityManagerActivity) {
+      beanList.remove(adapterPosition);
+      CityUtils.delete(str);
+    }
+    notifyDataSetChanged();
+  }
+
   public class WeatherHolder extends RecyclerView.ViewHolder {
     TextView weather_date;
     TextView weather_temperature;
     TextView weather_desc;
     ImageView weather_pic;
+    LinearLayout ll_weather;
+    View view_Line;
 
     public WeatherHolder(View itemView) {
       super(itemView);
@@ -209,6 +178,8 @@ public class WeatherRyAdapter extends RecyclerView.Adapter<WeatherRyAdapter.Weat
       if (itemView == mFooterView) {
         return;
       }
+      view_Line = itemView.findViewById(R.id.view_Line);
+      ll_weather = (LinearLayout) itemView.findViewById(R.id.ll_weather);
       weather_date = (TextView) itemView.findViewById(R.id.tv_weather_date);
       weather_desc = (TextView) itemView.findViewById(R.id.tv_weather_desc);
       weather_temperature = (TextView) itemView.findViewById(R.id.tv_weather_temperature);
