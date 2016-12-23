@@ -35,9 +35,6 @@ public class BaseActivity extends AppCompatActivity {
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mBaseContext = this;
-    UmengEvents.setChannel(this, Config.TONGJI_CHANNEL);
-    StatService.setDebugOn(false);
-    ScreenUtil.getInstance(this);
     setActivityStatus(this);
   }
 

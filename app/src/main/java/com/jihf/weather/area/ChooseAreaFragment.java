@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.jihf.weather.R;
 import com.jihf.weather.area.bean.City;
 import com.jihf.weather.area.bean.County;
 import com.jihf.weather.area.bean.Province;
+import com.jihf.weather.city.CityManagerActivity;
 import com.jihf.weather.config.Config;
 import com.jihf.weather.config.PermissionConfig;
 import com.jihf.weather.http.HttpLinstener;
@@ -34,7 +36,6 @@ import com.jihf.weather.utils.CityUtils;
 import com.jihf.weather.utils.DrawableUtils;
 import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.utils.Utility;
-import com.jihf.weather.city.CityManagerActivity;
 import com.jihf.weather.weather.WeatherActivity;
 import com.raiyi.wsh_lib_bdlocation.mgr.AddressListener;
 import com.raiyi.wsh_lib_bdlocation.mgr.LocationMgr;
@@ -49,11 +50,13 @@ public class ChooseAreaFragment extends Fragment {
 
   private static final String TAG = "ChooseAreaFragment";
 
-  public static final int LEVEL_PROVINCE = 0;
+  public static final int LEVEL_DEFAULT = 0;
 
-  public static final int LEVEL_CITY = 1;
+  public static final int LEVEL_PROVINCE = 1;
 
-  public static final int LEVEL_COUNTY = 2;
+  public static final int LEVEL_CITY = 2;
+
+  public static final int LEVEL_COUNTY = 3;
 
   private ProgressDialog progressDialog;
 
@@ -66,6 +69,7 @@ public class ChooseAreaFragment extends Fragment {
 
   private RelativeLayout rl_back;
   private RelativeLayout rl_more;
+  private SwipeRefreshLayout sf_area;
 
   private ListView listView;
 
@@ -101,7 +105,7 @@ public class ChooseAreaFragment extends Fragment {
   /**
    * 当前选中的级别
    */
-  private int currentLevel;
+  private int currentLevel = LEVEL_DEFAULT;
 
   private String strLocation = "定位中。。。";
 
@@ -137,6 +141,18 @@ public class ChooseAreaFragment extends Fragment {
           getLocationAddr();
         } else {
           doNext(tv_ocation.getText().toString());
+        }
+      }
+    });
+    sf_area = (SwipeRefreshLayout) view.findViewById(R.id.sf_area);
+    sf_area.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override public void onRefresh() {
+        if (currentLevel == LEVEL_DEFAULT) {
+          queryProvinces();
+        } else if (currentLevel == LEVEL_PROVINCE) {
+          queryCities();
+        } else if (currentLevel == LEVEL_CITY) {
+          queryCounties();
         }
       }
     });
@@ -242,6 +258,9 @@ public class ChooseAreaFragment extends Fragment {
       for (Province province : provinceList) {
         dataList.add(province.getProvinceName());
       }
+      if (null != sf_area) {
+        sf_area.setRefreshing(false);
+      }
       adapter.notifyDataSetChanged();
       listView.setSelection(0);
       currentLevel = LEVEL_PROVINCE;
@@ -262,6 +281,9 @@ public class ChooseAreaFragment extends Fragment {
       dataList.clear();
       for (City city : cityList) {
         dataList.add(city.getCityName());
+      }
+      if (null != sf_area) {
+        sf_area.setRefreshing(false);
       }
       adapter.notifyDataSetChanged();
       listView.setSelection(0);
@@ -285,6 +307,9 @@ public class ChooseAreaFragment extends Fragment {
       for (County county : countyList) {
         dataList.add(county.getCountyName());
       }
+      if (null != sf_area) {
+        sf_area.setRefreshing(false);
+      }
       adapter.notifyDataSetChanged();
       listView.setSelection(0);
       currentLevel = LEVEL_COUNTY;
@@ -303,6 +328,9 @@ public class ChooseAreaFragment extends Fragment {
     showProgressDialog();
     HttpManager.getInstance(getActivity()).getCity(address, new HttpLinstener() {
       @Override public void onSuccess(String response) {
+        if (null != sf_area) {
+          sf_area.setRefreshing(false);
+        }
         boolean result = false;
         if ("province".equals(type)) {
           result = Utility.handleProvinceResponse(response);
@@ -331,6 +359,9 @@ public class ChooseAreaFragment extends Fragment {
         // 通过runOnUiThread()方法回到主线程处理逻辑
         getActivity().runOnUiThread(new Runnable() {
           @Override public void run() {
+            if (null != sf_area) {
+              sf_area.setRefreshing(false);
+            }
             closeProgressDialog();
             Toast.makeText(getContext(), "加载失败", Toast.LENGTH_SHORT).show();
           }

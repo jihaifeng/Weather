@@ -8,7 +8,7 @@ android {
     //包名
     applicationId "com.jihf.weather"
     //分包
-    multiDexEnabled false
+    multiDexEnabled true
     //sdk版本
     minSdkVersion rootProject.ext.android.minSdkVersion
     targetSdkVersion rootProject.ext.android.targetSdkVersion
@@ -16,10 +16,6 @@ android {
     versionCode rootProject.ext.android.versionCode
     versionName rootProject.ext.android.versionName
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    ndk {
-      // 设置支持的SO库架构
-      abiFilters 'armeabi','x86' //'armeabi-v7a', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
-    }
   }
   buildTypes {
     release {
@@ -36,26 +32,22 @@ dependencies {
   })
   compile 'com.android.support:appcompat-v7:25.0.1'
   testCompile 'junit:junit:4.12'
-  compile project(':indexablerecyclerview')
-  compile 'com.android.support:recyclerview-v7:25.0.1'
   compile project(':WSHLocationLib_old')
   compile project(':WSHUMengTongJi')
   compile project(':OkHttpLib')
+  /*Material Design*/
   compile 'com.android.support:design:25.0.1'
+  /*字母导航的RecyclerView*/
+  compile project(':indexablerecyclerview')
+  compile 'com.android.support:recyclerview-v7:25.0.1'
   /*图片加载*/
   compile 'com.github.bumptech.glide:glide:3.7.0'
   /*分包*/
   compile 'com.android.support:multidex:1.0.1'
   /*数据库*/
   compile 'org.litepal.android:core:1.3.2'
-  /*异常分析*/
-  compile 'com.tencent.bugly:crashreport:latest.release'
-  //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
-  compile 'com.tencent.bugly:nativecrashreport:latest.release'
-  //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
-  compile files('libs/androidsvg-1.2.0.jar')
   /*多功能recyclerview*/
   compile 'com.yanzhenjie:recyclerview-swipe:1.0.2'
   /*高斯模糊*/
-//  compile 'net.qiujuer.genius:blur:2.0.0-beta4'
+  //  compile 'net.qiujuer.genius:blur:2.0.0-beta4'
 }

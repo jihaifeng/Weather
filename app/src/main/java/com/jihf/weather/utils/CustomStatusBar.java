@@ -33,7 +33,7 @@ public class CustomStatusBar {
   // android 6.0设置深色状态栏
   public static final int SYSTEM_UI_FLAG_LIGHT_STATUS_BAR = 0x00002000;
   public static final int SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN = 0x00000400;
-  public static   boolean isWhiteTitle = false;
+  public static boolean isWhiteTitle = false;
 
   /**
    * 设置状态栏颜色
@@ -215,7 +215,9 @@ public class CustomStatusBar {
       activity.getWindow().clearFlags(TRANSLUCENT_STATUS);
       activity.getWindow().addFlags(TRANSLUCENT_STATUS);
       activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
-      setSystemUi(activity);
+      if (isWhiteTitle) {
+        setSystemUi(activity);
+      }
     } else if (Build.VERSION.SDK_INT >= 23) {
       // android 6.0以上
       activity.getWindow().addFlags(SYSTEM_BAR);
@@ -262,7 +264,7 @@ public class CustomStatusBar {
     }
     if (drawerLayout != null) {
       int h = getStatusBarHeight(activity);
-      if (null != drawerLayout.getChildAt(1)){
+      if (null != drawerLayout.getChildAt(1)) {
         drawerLayout.getChildAt(1).setPadding(0, h, 0, 0);
       }
       // 此处不通用，针对116114首页添加以下代码huo

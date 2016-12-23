@@ -145,7 +145,12 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
 
   private void getSelectCity() {
     Bundle bundle = WeatherActivity.this.getIntent().getExtras();
-    String city = bundle.getString(Config.CITY_NAME_INTENT);
+    String city = cityName;
+    if (null == bundle) {
+      updateSelectCity(city);
+    } else {
+      city = bundle.getString(Config.CITY_NAME_INTENT);
+    }
     updateSelectCity(city);
   }
 
@@ -154,7 +159,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
       city = city.substring(0, city.length() - 1);
     }
     cityName = city;
-    BaseDataDb.insert(Config.CURRENT_CITY_NAME,cityName);
+    BaseDataDb.insert(Config.CURRENT_CITY_NAME, cityName);
     setSharedPreferences(Config.CURRENT_CITY_NAME, cityName);
     cityList = CityUtils.getCityList();
     if (null == cityList) {
@@ -309,15 +314,15 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
             } else {
               index = date.lastIndexOf("时");
             }
-            curTemperature = date.substring(index + 1, date.length() - 1).replace("℃","°");
-            remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity + " ( " + curTemperature+" )");
+            curTemperature = date.substring(index + 1, date.length() - 1).replace("℃", "°");
+            remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity + " ( " + curTemperature + " )");
           } else {
             remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity);
           }
           String desc = resultsBean.weather_data.get(0).weather;
           remoteViews.setTextViewText(R.id.weather_desc, "今日天气：" + desc);
-          remoteViews.setTextViewText(R.id.tv_temperature, resultsBean.weather_data.get(0).temperature.replace("℃","°"));
-          remoteViews.setTextViewText(R.id.tv_pm25, TextUtils.isEmpty(resultsBean.pm25) ? "":"PM2.5: " + resultsBean.pm25);
+          remoteViews.setTextViewText(R.id.tv_temperature, resultsBean.weather_data.get(0).temperature.replace("℃", "°"));
+          remoteViews.setTextViewText(R.id.tv_pm25, TextUtils.isEmpty(resultsBean.pm25) ? "" : "PM2.5: " + resultsBean.pm25);
           remoteViews.setImageViewResource(R.id.iv_image, WeatherUtils.getWeatherIcon(desc));
         }
       }
@@ -418,7 +423,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
             } else {
               index = date.lastIndexOf("时");
             }
-            curTemperature = date.substring(index + 1, date.length() - 1).replace("℃","°");
+            curTemperature = date.substring(index + 1, date.length() - 1).replace("℃", "°");
             tv_current_temperature.setText(curTemperature);
           } else {
             tv_current_temperature.setText("未获取到数据");
