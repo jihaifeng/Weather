@@ -2,10 +2,11 @@ package com.jihf.weather.welcome;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jihf.weather.R;
@@ -15,6 +16,8 @@ import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
 import com.jihf.weather.main.MainActivity;
 import com.jihf.weather.utils.CustomStatusBar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 //import com.jihf.weather.WeatherApplication;
 
@@ -27,14 +30,45 @@ import com.jihf.weather.utils.CustomStatusBar;
  */
 public class WelcomeActivity extends BaseActivity {
   private ImageView welcomePic;
+  private Timer timer = new Timer();
+  private TextView tv_time;
+  public static int time = 10;
+  private MyTimerTask mTimerTask;
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_welcome);
-    CustomStatusBar.setTranslucentForPic(this, Color.TRANSPARENT,false,false);
+    CustomStatusBar.setTranslucentForPic(this, Color.TRANSPARENT, false, false);
     initView();
-    getWelcomePic();
-    //updateWelComePic("");
+    //getWelcomePic();
+    updateWelComePic("");
+  }
+
+  class MyTimerTask extends TimerTask {
+    @Override public void run() {
+      time--;
+      updateText(time);
+      if (timer != null) {
+        timer.cancel();
+      }
+      if (time != 0) {
+        timer = new Timer();
+        timer.schedule(new MyTimerTask(), 1000);
+      } else {
+        JumpTo(WelcomeActivity.this, MainActivity.class);
+        WelcomeActivity.this.finish();
+      }
+    }
+  }
+
+  ;
+
+  private void updateText(int t) {
+    runOnUiThread(new Runnable() {
+      @Override public void run() {
+        tv_time.setText(time + "s 跳过");
+      }
+    });
   }
 
   private void getWelcomePic() {
@@ -56,15 +90,18 @@ public class WelcomeActivity extends BaseActivity {
       Glide.with(WelcomeActivity.this).load(response).placeholder(R.drawable.timg).diskCacheStrategy(DiskCacheStrategy.ALL).into(welcomePic);
       setSharedPreferences(Config.WELCOM_PIC, response);
     }
-    new Handler().postDelayed(new Runnable() {
-      @Override public void run() {
-        JumpTo(WelcomeActivity.this, MainActivity.class);
-        WelcomeActivity.this.finish();
-      }
-    }, 1 * 1000);
+    updateText(time);
+    timer.schedule(new MyTimerTask(), 1000);
   }
 
   private void initView() {
     welcomePic = (ImageView) findViewById(R.id.iv_welcome);
+    tv_time = (TextView) findViewById(R.id.tv_time);
+    tv_time.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        JumpTo(WelcomeActivity.this, MainActivity.class);
+        WelcomeActivity.this.finish();
+      }
+    });
   }
 }

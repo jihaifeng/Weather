@@ -147,6 +147,7 @@ public class ChooseAreaFragment extends Fragment {
     sf_area = (SwipeRefreshLayout) view.findViewById(R.id.sf_area);
     sf_area.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override public void onRefresh() {
+        getLocationAddr();
         if (currentLevel == LEVEL_DEFAULT) {
           queryProvinces();
         } else if (currentLevel == LEVEL_PROVINCE) {

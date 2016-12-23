@@ -25,7 +25,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginLeft="2dp"
-          android:background="@drawable/weather_default"
+          android:background="@drawable/roundbg_red"
           android:gravity="center_vertical"
           android:paddingBottom="2dp"
           android:paddingLeft="2dp"

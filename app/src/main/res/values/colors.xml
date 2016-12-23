@@ -8,6 +8,6 @@
   <color name="text_gray2">#515151</color>
   <color name="text_black">#000000</color>
   <color name="transparent">#00000000</color>
-  <color name="half_transparent">#E0000000</color>
+  <color name="half_transparent">#50000000</color>
   <color name="white">#ffffffff</color>
 </resources>

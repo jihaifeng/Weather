@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+
 /**
  * 自定义状态栏，导航栏沉浸
  *
@@ -25,7 +27,7 @@ public class CustomStatusBar {
   // 半透明效果
   public static final int DEFAULT_STATUS_BAR_ALPHA = 56;
   // 状态栏
-  private static int TRANSLUCENT_STATUS = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+  private static int TRANSLUCENT_STATUS = FLAG_TRANSLUCENT_STATUS;
   // 导航栏
   private static int TRANSLUCENT_NAVIGATION = WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
   // system_bar
@@ -62,7 +64,7 @@ public class CustomStatusBar {
           // 6.0以下白色背景
           statusBarAlpha = DEFAULT_STATUS_BAR_ALPHA;
         }
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        activity.getWindow().addFlags(FLAG_TRANSLUCENT_STATUS);
         // 生成一个状态栏大小的矩形
         View statusView = createStatusBarView(activity, color, statusBarAlpha);
         // 添加 statusView 到布局中
@@ -199,21 +201,33 @@ public class CustomStatusBar {
     setRootView(activity, diff, statusBar, drawerLayout);
   }
 
+  /**
+   * 使状态栏透明
+   */
+  @TargetApi(Build.VERSION_CODES.KITKAT) private static void transparentStatusBar(Activity activity) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+      activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+      activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+      activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
+    } else {
+      activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    }
+  }
+
   private static void transparentStatusBar(Activity activity, boolean isAll) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
       // android 4.4以下
       return;
-      // activity.requestWindowFeature(Window.FEATURE_NO_TITLE);//
-      // 去掉标题栏
-
     } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
       // android 4.4 到android 5.0
       activity.getWindow().addFlags(TRANSLUCENT_STATUS);
     } else if (Build.VERSION.SDK_INT < 23) {
       // android 5.0到android 6.0
+
       activity.getWindow().addFlags(SYSTEM_BAR);
       activity.getWindow().clearFlags(TRANSLUCENT_STATUS);
-      activity.getWindow().addFlags(TRANSLUCENT_STATUS);
+      activity.getWindow().addFlags(TRANSLUCENT_NAVIGATION);
       activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
       if (isWhiteTitle) {
         setSystemUi(activity);
@@ -222,7 +236,7 @@ public class CustomStatusBar {
       // android 6.0以上
       activity.getWindow().addFlags(SYSTEM_BAR);
       activity.getWindow().clearFlags(TRANSLUCENT_STATUS);
-      activity.getWindow().addFlags(TRANSLUCENT_STATUS);
+      activity.getWindow().addFlags(TRANSLUCENT_NAVIGATION);
       activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
       // android 6.0 设置深色状态栏
       if (isWhiteTitle) {
@@ -381,6 +395,7 @@ public class CustomStatusBar {
         } else {
           value &= ~bit;
         }
+        lp.flags = lp.FLAG_TRANSLUCENT_STATUS | lp.FLAG_TRANSLUCENT_NAVIGATION;
         meizuFlags.setInt(lp, value);
         window.setAttributes(lp);
         result = true;
