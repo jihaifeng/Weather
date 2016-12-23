@@ -25,6 +25,7 @@ public class Config {
 
   public static final String FROM_WEATHER = "from_weather";
   public static final String WELCOM_PIC = "welcom_pic";
+  public static final int WEATHER_NOTI_ID = 10101;
   //指数
   public static final String WEATHER_DRESS = "穿衣";
   public static final String WEATHER_CATCHACOLD = "感冒";

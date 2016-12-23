@@ -90,71 +90,71 @@ public abstract class WeatherUtils {
       //多云
       drawableId = R.drawable.weather_icon_cloud;
     }
-    if (weather.startsWith("小雨")) {
+    if (weather.contains("小雨")) {
       //小雨
       drawableId = R.drawable.weather_icon_lightrain;
     }
-    if (weather.startsWith("中雨")) {
+    if (weather.contains("中雨")) {
       //中雨
       drawableId = R.drawable.weather_icon_moderaterain;
     }
-    if (weather.startsWith("大雨")) {
+    if (weather.contains("大雨")) {
       //大雨
       drawableId = R.drawable.weather_icon_heavyrain;
     }
-    if (weather.startsWith("暴雨")) {
+    if (weather.contains("暴雨")) {
       //暴雨
       drawableId = R.drawable.weather_icon_heavyrains;
     }
-    if (weather.startsWith("雷阵雨")) {
+    if (weather.contains("雷阵雨")) {
       //雷阵雨
       drawableId = R.drawable.weather_icon_thunderstorm;
     }
-    if (weather.startsWith("小雪")) {
+    if (weather.contains("小雪")) {
       //小雪
       drawableId = R.drawable.weather_icon_lightsnow;
     }
-    if (weather.startsWith("中雪")) {
+    if (weather.contains("中雪")) {
       //中雪
       drawableId = R.drawable.weather_icon_moderatesnow;
     }
-    if (weather.startsWith("大雪")) {
+    if (weather.contains("大雪")) {
       //大雪
       drawableId = R.drawable.weather_icon_heavysnow;
     }
-    if (weather.startsWith("暴雪")) {
+    if (weather.contains("暴雪")) {
       //暴雪
       drawableId = R.drawable.weather_icon_blizzard;
     }
-    if (weather.startsWith("雨夹雪")) {
+    if (weather.contains("雨夹雪")) {
       //雨夹雪
       drawableId = R.drawable.weather_icon_sleet;
     }
-    if (weather.startsWith("冰雹")) {
+    if (weather.contains("冰雹")) {
       //冰雹
       drawableId = R.drawable.weather_icon_hail;
     }
-    if (weather.startsWith("彩虹")) {
+    if (weather.contains("彩虹")) {
       //彩虹
       drawableId = R.drawable.weather_icon_rainbow;
     }
-    if (weather.startsWith("沙尘暴")) {
+    if (weather.contains("沙尘暴")) {
       //沙尘暴
       drawableId = R.drawable.weather_icon_duststorms;
     }
-    if (weather.startsWith("雾")) {
+    if (weather.contains("雾")) {
       //雾
       drawableId = R.drawable.weather_icon_fog;
     }
-    if (weather.startsWith("霾")) {
+    if (weather.contains("霾")) {
       //霾
       drawableId = R.drawable.weather_icon_haze;
     }
-    if (weather.startsWith("火山")) {
+    if (weather.contains("火山")) {
       //火山
       drawableId = R.drawable.weather_icon_volcano;
     }
-    if (weather.startsWith("龙卷风")) {
+    if (weather.contains("龙卷风")) {
       //龙卷风
       drawableId = R.drawable.weather_icon_tornado;
     }

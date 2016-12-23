@@ -56,4 +56,6 @@ dependencies {
   compile files('libs/androidsvg-1.2.0.jar')
   /*多功能recyclerview*/
   compile 'com.yanzhenjie:recyclerview-swipe:1.0.2'
+  /*高斯模糊*/
+//  compile 'net.qiujuer.genius:blur:2.0.0-beta4'
 }

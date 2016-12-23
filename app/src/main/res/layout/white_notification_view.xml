@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
+
+  <ImageView
+      android:id="@+id/iv_image"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:layout_centerVertical="true"
+      android:layout_marginLeft="15dp"
+      android:scaleType="fitXY"
+      />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_toEndOf="@+id/iv_image"
+      android:layout_toLeftOf="@+id/ll_root2"
+      android:layout_toRightOf="@+id/iv_image"
+      android:layout_toStartOf="@+id/ll_root2"
+      android:gravity="center_vertical"
+      android:orientation="vertical"
+      android:paddingLeft="10dp"
+      android:paddingRight="10dp">
+
+    <TextView
+        android:id="@+id/tv_city"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="苏州"
+        android:textColor="@color/white"
+        android:textSize="13sp"/>
+
+    <TextView
+        android:id="@+id/weather_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="多云"
+        android:textColor="@color/white"
+        android:textSize="9sp"/>
+  </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/ll_root2"
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:layout_alignParentEnd="true"
+      android:layout_alignParentRight="true"
+      android:gravity="center_vertical"
+      android:orientation="vertical"
+      android:paddingRight="10dp">
+
+    <TextView
+        android:id="@+id/tv_temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:gravity="center"
+        android:padding="3dp"
+        android:text="10-2℃"
+        android:textColor="@color/white"
+        android:textSize="13sp"/>
+
+    <TextView
+        android:id="@+id/tv_pm25"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="3dp"
+        android:text="pm25: 100"
+        android:textColor="@color/white"
+        android:textSize="9sp"/>
+  </LinearLayout>
+
+</RelativeLayout>

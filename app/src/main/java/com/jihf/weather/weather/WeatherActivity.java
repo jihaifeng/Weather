@@ -1,11 +1,13 @@
 package com.jihf.weather.weather;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -29,6 +32,7 @@ import com.jihf.weather.customview.ScrollView.MyScrollView;
 import com.jihf.weather.http.WeatherLinstener;
 import com.jihf.weather.utils.CityUtils;
 import com.jihf.weather.utils.CustomStatusBar;
+import com.jihf.weather.utils.NotificationUtils;
 import com.jihf.weather.utils.ScreenUtil;
 import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.utils.WeatherUtils;
@@ -274,6 +278,67 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     }
     updateHeaderData(results);
     updateFootData(results);
+    showWeatherNotification(results);
+  }
+
+  private void showWeatherNotification(List<ResultsBean> results) {
+    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    //设置通知小ICON,一定要设置，不能少
+    builder.setSmallIcon(R.mipmap.ic_launcher);
+    RemoteViews remoteViews;
+
+    if (NotificationUtils.isDarkNotification(WeatherActivity.this)) {
+      //深色通知栏背景，设置浅色自定义通知栏布局
+      remoteViews = new RemoteViews(getPackageName(), R.layout.white_notification_view);
+    } else {
+      remoteViews = new RemoteViews(getPackageName(), R.layout.dark_notification_view);
+    }
+    for (ResultsBean resultsBean : results) {
+      if (resultsBean.currentCity.equalsIgnoreCase(cityName)) {
+
+        if (results.size() != 0 && null != resultsBean.weather_data && resultsBean.weather_data.size() != 0) {
+          String date = TextUtils.isEmpty(resultsBean.weather_data.get(0).date) ? "" : resultsBean.weather_data.get(0).date;
+          if (!TextUtils.isEmpty(date) && date.contains("实时")) {
+            int index = 0;
+            if (date.contains("实时：")) {
+              index = date.lastIndexOf("：");
+            } else {
+              index = date.lastIndexOf("时");
+            }
+            curTemperature = date.substring(index + 1, date.length() - 1);
+            remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity + " ( " + curTemperature+" )");
+          } else {
+            remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity);
+          }
+          String desc = resultsBean.weather_data.get(0).weather;
+          remoteViews.setTextViewText(R.id.weather_desc, "今日天气：" + desc);
+          remoteViews.setTextViewText(R.id.tv_temperature, resultsBean.weather_data.get(0).temperature);
+          remoteViews.setTextViewText(R.id.tv_pm25, TextUtils.isEmpty(resultsBean.pm25) ? "":"PM2.5: " + resultsBean.pm25);
+          remoteViews.setImageViewResource(R.id.iv_image, WeatherUtils.getWeatherIcon(desc));
+        }
+      }
+    }
+    builder.setContent(remoteViews);
+    //点击通知栏的notification后，是否自动被取消消失
+    builder.setAutoCancel(false);
+    //是否禁止滑动删除
+    builder.setOngoing(true);
+    //通知首次出现在通知栏，带上升动画效果的
+    builder.setTicker("通知栏也能看天气啦");
+    builder.setPriority(NotificationCompat.PRIORITY_MAX);
+    notificationManager.notify(Config.WEATHER_NOTI_ID, builder.build());
+
+    ////设置通知栏点击意图
+    // builder.setContentIntent(new PendingIntent());
+    // //  .setNumber(number) //设置通知集合的数量
+    // builder.setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+    // builder.setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+    // builder.setAutoCancel(true)//设置这个标志当用户单击面板就可以让通知将自动取消
+    // builder.setOngoing(false)//ture，设置他为一个正在进行的通知。他们通常是用来表示一个后台任务,用户积极参与(如播放音乐)或以某种方式正在等待,因此占用设备(如一个文件下载,同步操作,主动网络连接)
+    // builder.setDefaults(Notification.DEFAULT_VIBRATE)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合
+    // //Notification.DEFAULT_ALL  Notification.DEFAULT_SOUND 添加声音 // requires VIBRATE permission
+    // builder.setSmallIcon(R.drawable.ic_launcher);//设置通知小ICON
   }
 
   private void updateFootData(List<ResultsBean> results) {
@@ -329,7 +394,6 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
         viewLine1.setVisibility(View.GONE);
       }
       ll_PM25.setVisibility(View.GONE);
-      viewLine.setVisibility(View.GONE);
     } else {
       ll_PM25.setVisibility(View.VISIBLE);
       viewLine.setVisibility(View.VISIBLE);
@@ -377,7 +441,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
       return;
     }
     switch (requestCode) {
-      case Config.SELECT_CITY_CODE:
+      case SELECT_CITY_CODE:
         String city = data.getStringExtra(Config.CITY_NAME_INTENT);
         updateSelectCity(city);
         getWeather();
