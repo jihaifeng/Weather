@@ -9,7 +9,7 @@
     <mapping class="com.jihf.weather.area.bean.Province"/>
     <mapping class="com.jihf.weather.area.bean.City"/>
     <mapping class="com.jihf.weather.area.bean.County"/>
-    <mapping class="com.jihf.weather.area.bean.BaseDbData"/>
+    <mapping class="com.jihf.weather.base.BaseDataDb"/>
   </list>
 
 </litepal>

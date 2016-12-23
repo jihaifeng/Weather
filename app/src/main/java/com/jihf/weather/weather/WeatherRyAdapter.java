@@ -12,8 +12,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jihf.weather.R;
+import com.jihf.weather.city.CityManagerActivity;
 import com.jihf.weather.config.Config;
 import com.jihf.weather.utils.CityUtils;
+import com.jihf.weather.utils.SpannableStringUtils;
 import com.jihf.weather.utils.WeatherUtils;
 import com.jihf.weather.weather.bean.ResultsBean;
 import com.jihf.weather.weather.bean.WeatherDataBean;
@@ -125,9 +127,15 @@ public class WeatherRyAdapter extends SwipeMenuAdapter<WeatherRyAdapter.WeatherH
       }
       if (null != weatherDataBean) {
         //这里加载数据的时候要注意，是从position-1开始，因为position==0已经被header占用了
+        if (str.equals(WeatherUtils.getCurCityName())) {
+          holder.weather_default.setVisibility(View.VISIBLE);
+        } else {
+          holder.weather_default.setVisibility(View.INVISIBLE);
+        }
         holder.weather_date.setText(str);
+        SpannableStringUtils.getBuilder(str).setSubscript();
         holder.weather_desc.setText(weatherDataBean.weather);
-        holder.weather_temperature.setText(weatherDataBean.temperature.replace("~", "/"));
+        holder.weather_temperature.setText(weatherDataBean.temperature.replace("~", "/").replace("℃","°"));
         int drawableId = WeatherUtils.getWeatherIcon(weatherDataBean.weather);
         Glide.with(mContext).load(drawableId).error(R.drawable.weather_icon_nonetwork).into(holder.weather_pic);
       }
@@ -164,6 +172,7 @@ public class WeatherRyAdapter extends SwipeMenuAdapter<WeatherRyAdapter.WeatherH
   public class WeatherHolder extends RecyclerView.ViewHolder {
     TextView weather_date;
     TextView weather_temperature;
+    TextView weather_default;
     TextView weather_desc;
     ImageView weather_pic;
     LinearLayout ll_weather;
@@ -181,6 +190,7 @@ public class WeatherRyAdapter extends SwipeMenuAdapter<WeatherRyAdapter.WeatherH
       view_Line = itemView.findViewById(R.id.view_Line);
       ll_weather = (LinearLayout) itemView.findViewById(R.id.ll_weather);
       weather_date = (TextView) itemView.findViewById(R.id.tv_weather_date);
+      weather_default = (TextView) itemView.findViewById(R.id.tv_default);
       weather_desc = (TextView) itemView.findViewById(R.id.tv_weather_desc);
       weather_temperature = (TextView) itemView.findViewById(R.id.tv_weather_temperature);
       weather_pic = (ImageView) itemView.findViewById(R.id.iv_weather_pic);

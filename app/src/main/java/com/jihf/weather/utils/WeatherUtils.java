@@ -5,10 +5,15 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.google.gson.Gson;
 import com.jihf.weather.R;
+import com.jihf.weather.base.BaseDataDb;
+import com.jihf.weather.config.Config;
 import com.jihf.weather.http.HttpLinstener;
 import com.jihf.weather.http.HttpManager;
 import com.jihf.weather.http.WeatherLinstener;
+import com.jihf.weather.weather.bean.CurCityWeatherBean;
+import com.jihf.weather.weather.bean.ResultsBean;
 import com.jihf.weather.weather.bean.WeatherBase;
+import java.util.List;
 
 /**
  * Func：
@@ -18,6 +23,7 @@ import com.jihf.weather.weather.bean.WeatherBase;
  * Mail：jihaifeng@raiyi.com
  */
 public abstract class WeatherUtils {
+
   public static void getWeather(final Context context, boolean pullDown, final WeatherLinstener weatherLinstener) {
     if (!pullDown) {
       ProgressUtils.showProgressDialog(context);
@@ -42,6 +48,42 @@ public abstract class WeatherUtils {
         weatherLinstener.showError(msg);
       }
     });
+  }
+
+  public static CurCityWeatherBean getCurCityWeather(List<ResultsBean> results) {
+    if (null == results) {
+      return null;
+    }
+    String curCity = getCurCityName();
+    for (ResultsBean resultsBean : results) {
+      try {
+        if (curCity.equals(resultsBean.currentCity)) {
+          CurCityWeatherBean curCityWeatherBean = new CurCityWeatherBean();
+          curCityWeatherBean.currentCity = resultsBean.currentCity;
+          curCityWeatherBean.date = TimeUtils.getCurDataString();
+          curCityWeatherBean.index = resultsBean.index;
+          curCityWeatherBean.pm25 = resultsBean.pm25;
+          curCityWeatherBean.weather_data = resultsBean.weather_data.get(0);
+          return curCityWeatherBean;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+      }
+    }
+    return null;
+  }
+
+  public static String getCurCityName() {
+    List<BaseDataDb> baseDataDbs = BaseDataDb.get(Config.CURRENT_CITY_NAME);
+    if (null == baseDataDbs || baseDataDbs.size() != 1) {
+      return null;
+    }
+    String curCity = baseDataDbs.get(0).value;
+    if (TextUtils.isEmpty(curCity)) {
+      return null;
+    }
+    return curCity;
   }
 
   public static int getWeatherIcon(String weather) {
@@ -168,26 +210,81 @@ public abstract class WeatherUtils {
     }
     int hour = TimeUtils.getCurHour();
     Log.e("updateBg", "updateBg: " + hour);
-    if (hour >= 18 || hour < 6) {
-      //夜
-      if (desc.contains("晴")) {
-        drawableId = R.drawable.weather_night_sun;
-      } else if (desc.contains("雨")) {
-        drawableId = R.drawable.weather_night_rain;
-      } else if (desc.contains("雪")) {
-        drawableId = R.drawable.weather_night_snow;
-      }
-    } else {
+    if (6 < hour && hour < 18) {
       //昼
-      if (desc.contains("晴")) {
+      if (desc.contains("晴") && !desc.contains("阴") && !desc.contains("多云")) {
+        //晴天
         drawableId = R.drawable.weather_day_sun;
-      } else if (desc.contains("雨")) {
+      }
+      if (desc.contains("阴") || desc.contains("多云")) {
+        //阴天，多云
+        drawableId = R.drawable.timg;
+      }
+      if (desc.contains("雨")) {
+        //雨天
         drawableId = R.drawable.weather_day_rain;
-      } else if (desc.contains("雪")) {
+      }
+      if (desc.contains("雪")) {
+        //雪天
         drawableId = R.drawable.weather_day_snow;
       }
+      if (desc.contains("雾")) {
+        //雾天
+        drawableId = R.drawable.weather_day_fog;
+      }
+      if (desc.contains("雷阵雨")) {
+        drawableId = R.drawable.weather_day_thunderstorm;
+      }
+    } else {
+      //夜
+      if (desc.contains("晴") && !desc.contains("阴") && !desc.contains("多云")) {
+        //晴天
+        drawableId = R.drawable.weather_night_sun;
+      }
+      if (desc.contains("阴") || desc.contains("多云")) {
+        //阴天，多云
+        drawableId = R.drawable.timg;
+      }
+      if (desc.contains("雨")) {
+        //雨天
+        drawableId = R.drawable.weather_night_rain;
+      }
+      if (desc.contains("雪")) {
+        //雪天
+        drawableId = R.drawable.weather_night_snow;
+      }
+      if (desc.contains("雾")) {
+        //雾天
+        drawableId = R.drawable.weather_night_fog;
+      }
+      if (desc.contains("雷阵雨")) {
+        drawableId = R.drawable.weather_day_thunderstorm;
+      }
     }
-
+    if (desc.contains("霾")) {
+      //霾天
+      drawableId = R.drawable.weather_day_haze;
+    }
+    if (desc.contains("雨夹雪")) {
+      //雨夹雪
+      drawableId = R.drawable.timg;
+    }
+    if (desc.contains("冰雹")) {
+      //冰雹
+      drawableId = R.drawable.timg;
+    }
+    if (desc.contains("彩虹")) {
+      //彩虹
+      drawableId = R.drawable.timg;
+    }
+    if (desc.contains("沙尘暴")) {
+      //沙尘暴天
+      drawableId = R.drawable.timg;
+    }
+    if (desc.contains("龙卷风")) {
+      //龙卷风
+      drawableId = R.drawable.timg;
+    }
     return drawableId;
   }
 }

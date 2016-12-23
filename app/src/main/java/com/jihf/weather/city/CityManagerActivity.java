@@ -1,4 +1,4 @@
-package com.jihf.weather.weather;
+package com.jihf.weather.city;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,6 +23,7 @@ import com.jihf.weather.utils.CityUtils;
 import com.jihf.weather.utils.CustomStatusBar;
 import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.utils.WeatherUtils;
+import com.jihf.weather.weather.WeatherRyAdapter;
 import com.jihf.weather.weather.bean.ResultsBean;
 import com.yanzhenjie.recyclerview.swipe.Closeable;
 import com.yanzhenjie.recyclerview.swipe.OnSwipeMenuItemClickListener;

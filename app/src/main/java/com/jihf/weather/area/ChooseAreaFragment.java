@@ -34,7 +34,7 @@ import com.jihf.weather.utils.CityUtils;
 import com.jihf.weather.utils.DrawableUtils;
 import com.jihf.weather.utils.ToastUtil;
 import com.jihf.weather.utils.Utility;
-import com.jihf.weather.weather.CityManagerActivity;
+import com.jihf.weather.city.CityManagerActivity;
 import com.jihf.weather.weather.WeatherActivity;
 import com.raiyi.wsh_lib_bdlocation.mgr.AddressListener;
 import com.raiyi.wsh_lib_bdlocation.mgr.LocationMgr;

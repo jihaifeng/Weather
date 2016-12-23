@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_weather"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:id="@+id/ll_weather"
     android:orientation="vertical"
     >
 
@@ -15,15 +15,37 @@
       android:paddingBottom="5dp"
       android:paddingTop="5dp">
 
-    <TextView
-        android:id="@+id/tv_weather_date"
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:textColor="@color/text_black"
-        android:textSize="15sp"/>
+        android:layout_weight="1">
+
+      <TextView
+          android:id="@+id/tv_default"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="2dp"
+          android:background="@drawable/weather_default"
+          android:gravity="center_vertical"
+          android:paddingBottom="2dp"
+          android:paddingLeft="2dp"
+          android:paddingRight="2dp"
+          android:text="now"
+          android:textColor="@android:color/holo_red_light"
+          android:textSize="7sp"/>
+
+      <TextView
+          android:id="@+id/tv_weather_date"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_toRightOf="@+id/tv_default"
+          android:ellipsize="end"
+          android:gravity="center_vertical"
+          android:maxLines="1"
+          android:textColor="@color/text_black"
+          android:textSize="15sp"/>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="0dp"

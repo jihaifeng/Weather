@@ -27,11 +27,6 @@ public class AreaPickActivity extends BaseActivity {
     setContentView(R.layout.activity_main);
     Toolbar toolbar = (Toolbar) findViewById(R.id.tb_title);
     CustomStatusBar.setTranslucent(this, Color.TRANSPARENT, false, toolbar);
-    //if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-    //  ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, PermissionConfig.PERMISSION_LOCATION);
-    //} else {
-    //  startLocation();
-    //}
   }
 
 

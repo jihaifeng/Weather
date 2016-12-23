@@ -1,8 +1,7 @@
-package com.jihf.weather.area.bean;
+package com.jihf.weather.base;
 
 import android.content.ContentValues;
 import android.text.TextUtils;
-import android.util.Log;
 import java.util.List;
 import org.litepal.crud.DataSupport;
 
@@ -13,15 +12,15 @@ import org.litepal.crud.DataSupport;
  * Time: 16:41
  * Mail：jihaifeng@raiyi.com
  */
-public class BaseDbData extends DataSupport {
-  public String title;
-  public String content;
+public class BaseDataDb extends DataSupport {
+  public String key;
+  public String value;
 
-  public static List<BaseDbData> get(String key) {
+  public static List<BaseDataDb> get(String key) {
     if (TextUtils.isEmpty(key)) {
       return null;
     }
-    List<BaseDbData> datas = DataSupport.where("title = ?", key).find(BaseDbData.class);
+    List<BaseDataDb> datas = DataSupport.where("key = ?", key).find(BaseDataDb.class);
     if (null != datas && datas.size() != 0) {
       return datas;
     }
@@ -32,14 +31,13 @@ public class BaseDbData extends DataSupport {
     if (TextUtils.isEmpty(key)) {
       return false;
     }
-    boolean isKeyExist = DataSupport.isExist(BaseDbData.class, "title = ? ", key);
-    Log.i("CityUtils", "insert: " + isKeyExist);
+    boolean isKeyExist = DataSupport.isExist(BaseDataDb.class, "key = ? ", key);
     if (isKeyExist) {
       return update(key, val) > 0;
     }
-    BaseDbData baseDbData = new BaseDbData();
-    baseDbData.title = key;
-    baseDbData.content = val;
+    BaseDataDb baseDbData = new BaseDataDb();
+    baseDbData.key = key;
+    baseDbData.value = val;
     return baseDbData.save();
   }
 
@@ -48,14 +46,14 @@ public class BaseDbData extends DataSupport {
       return 0;
     }
     ContentValues values = new ContentValues();
-    values.put("content", val);
-    return DataSupport.updateAll(BaseDbData.class, values, "title = ? ", key);
+    values.put("value", val);
+    return DataSupport.updateAll(BaseDataDb.class, values, "key = ? ", key);
   }
 
   public static int delete(String key) {
     if (TextUtils.isEmpty(key)) {
       return 0;
     }
-    return DataSupport.deleteAll(BaseDbData.class, "title = ? ", key);
+    return DataSupport.deleteAll(BaseDataDb.class, "key = ? ", key);
   }
 }

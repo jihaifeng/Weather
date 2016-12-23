@@ -2,7 +2,7 @@ package com.jihf.weather.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
-import com.jihf.weather.area.bean.BaseDbData;
+import com.jihf.weather.base.BaseDataDb;
 import com.jihf.weather.config.Config;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +26,11 @@ public class CityUtils {
   }
 
   public static String getCityStr() {
-    List<BaseDbData> datas = BaseDbData.get(Config.SELECT_CITY_LIST);
+    List<BaseDataDb> datas = BaseDataDb.get(Config.SELECT_CITY_LIST);
     if (null == datas) {
       return null;
     }
-    String cityData = datas.get(0).content;
+    String cityData = datas.get(0).value;
     return cityData;
   }
 
@@ -39,7 +39,7 @@ public class CityUtils {
       return false;
     }
     Log.i(TAG, "insertCityList: " + cityList.size());
-    return BaseDbData.insert(Config.SELECT_CITY_LIST, listToString(cityList));
+    return BaseDataDb.insert(Config.SELECT_CITY_LIST, listToString(cityList));
   }
 
   public static int delete(String str) {
@@ -51,7 +51,7 @@ public class CityUtils {
       cityList.remove(str);
     }
     Log.i(TAG, "delete: " +cityList);
-    return BaseDbData.update(Config.SELECT_CITY_LIST, listToString(cityList));
+    return BaseDataDb.update(Config.SELECT_CITY_LIST, listToString(cityList));
   }
 
   public static List<String> stringToList(String key) {
