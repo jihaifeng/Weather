@@ -11,10 +11,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import com.baidu.mobstat.StatService;
-import com.jihf.weather.config.Config;
+import com.jihf.weather.swipbackhelper.SwipeBackHelper;
 import com.jihf.weather.utils.AppUtils;
-import com.jihf.weather.utils.ScreenUtil;
 import com.ruiyi.lib.hfb.umeng.UmengEvents;
 
 /**
@@ -34,6 +32,12 @@ public class BaseActivity extends AppCompatActivity {
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    SwipeBackHelper.onCreate(this);
+    SwipeBackHelper.getCurrentPage(this)
+        .setSwipeBackEnable(true)
+        .setSwipeSensitivity(0.5f)
+        .setSwipeRelateEnable(true)
+        .setSwipeRelateOffset(300);
     mBaseContext = this;
     setActivityStatus(this);
   }
@@ -89,6 +93,7 @@ public class BaseActivity extends AppCompatActivity {
 
   @Override protected void onDestroy() {
     super.onDestroy();
+    SwipeBackHelper.onDestroy(this);
     // 在Activity栈中移除Activity
     AppUtils.getInstance().removeActivity(this);
     Log.i(TAG, "-------onDestroy------");
@@ -97,6 +102,11 @@ public class BaseActivity extends AppCompatActivity {
   @Override protected void onRestart() {
     super.onRestart();
     Log.i(TAG, "-------onRestart------");
+  }
+  @Override
+  protected void onPostCreate(Bundle savedInstanceState) {
+    super.onPostCreate(savedInstanceState);
+    SwipeBackHelper.onPostCreate(this);
   }
 
   public void JumpTo(Context from, Class to) {
@@ -140,6 +150,7 @@ public class BaseActivity extends AppCompatActivity {
     progressDialog.show();
   }
 
+
   /**
    * 关闭进度对话框
    */
@@ -148,4 +159,5 @@ public class BaseActivity extends AppCompatActivity {
       progressDialog.dismiss();
     }
   }
+
 }

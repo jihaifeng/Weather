@@ -6,6 +6,7 @@ import android.support.multidex.MultiDexApplication;
 import com.baidu.mobstat.StatService;
 import com.jihf.weather.config.Config;
 import com.jihf.weather.crash.CrashHandler;
+import com.jihf.weather.utils.AppUtils;
 import com.jihf.weather.utils.ScreenUtil;
 import com.ruiyi.lib.hfb.umeng.UmengEvents;
 import org.litepal.LitePalApplication;
@@ -60,5 +61,9 @@ public class WeatherApplication extends MultiDexApplication {
       sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
     return sharedPreferences.getString(key, null);
+  }
+
+  public void exitApp() {
+    AppUtils.getInstance().finishAllActivity();
   }
 }

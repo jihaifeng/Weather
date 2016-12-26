@@ -2,6 +2,7 @@ package com.jihf.weather.weather;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +26,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jihf.weather.R;
+import com.jihf.weather.WeatherApplication;
 import com.jihf.weather.base.BaseActivity;
 import com.jihf.weather.base.BaseDataDb;
 import com.jihf.weather.city.CityManagerActivity;
@@ -32,8 +35,10 @@ import com.jihf.weather.customview.RecyclerView.DividerGridItemDecoration;
 import com.jihf.weather.customview.RecyclerView.GridLayoutManagerPlus;
 import com.jihf.weather.customview.ScrollView.MyScrollView;
 import com.jihf.weather.http.WeatherLinstener;
+import com.jihf.weather.swipbackhelper.SwipeBackHelper;
 import com.jihf.weather.utils.CityUtils;
 import com.jihf.weather.utils.CustomStatusBar;
+import com.jihf.weather.utils.DialogUtils;
 import com.jihf.weather.utils.NotificationUtils;
 import com.jihf.weather.utils.ScreenUtil;
 import com.jihf.weather.utils.ToastUtil;
@@ -44,6 +49,7 @@ import com.jihf.weather.weather.bean.WeatherDataBean;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static com.jihf.weather.config.Config.SELECT_CITY_CODE;
 
 /**
@@ -103,6 +109,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_weather);
+    SwipeBackHelper.getCurrentPage(this).setSwipeBackEnable(false);
     toolbar = (Toolbar) findViewById(R.id.tb_title);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle("");
@@ -144,12 +151,13 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   }
 
   private void getSelectCity() {
-    Bundle bundle = WeatherActivity.this.getIntent().getExtras();
+    Intent intent = WeatherActivity.this.getIntent();
     String city = cityName;
-    if (null == bundle) {
-      updateSelectCity(city);
-    } else {
-      city = bundle.getString(Config.CITY_NAME_INTENT);
+    if (null != intent) {
+      Bundle bundle = intent.getExtras();
+      if (null != bundle) {
+        city = bundle.getString(Config.CITY_NAME_INTENT);
+      }
     }
     updateSelectCity(city);
   }
@@ -270,7 +278,6 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
   }
 
   private void updateData(List<ResultsBean> results) {
-    toolbar.setBackgroundColor(ContextCompat.getColor(WeatherActivity.this, R.color.transparent));
     pullDown = false;
     if (null == results || results.size() == 0) {
       showErrorView("数据出错，请稍后重试");
@@ -294,6 +301,10 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
     //设置通知小ICON,一定要设置，不能少
     builder.setSmallIcon(R.mipmap.ic_launcher);
+    Intent intent = new Intent(this, WeatherActivity.class);
+    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_CANCEL_CURRENT);
+    builder.setContentIntent(pendingIntent);
+
     RemoteViews remoteViews;
 
     if (NotificationUtils.isDarkNotification(WeatherActivity.this)) {
@@ -308,14 +319,9 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
         if (results.size() != 0 && null != resultsBean.weather_data && resultsBean.weather_data.size() != 0) {
           String date = TextUtils.isEmpty(resultsBean.weather_data.get(0).date) ? "" : resultsBean.weather_data.get(0).date;
           if (!TextUtils.isEmpty(date) && date.contains("实时")) {
-            int index = 0;
-            if (date.contains("实时：")) {
-              index = date.lastIndexOf("：");
-            } else {
-              index = date.lastIndexOf("时");
-            }
+            int index = date.lastIndexOf("(");
             curTemperature = date.substring(index + 1, date.length() - 1).replace("℃", "°");
-            remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity + " ( " + curTemperature + " )");
+            remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity + " ( " + curTemperature.trim() + ")");
           } else {
             remoteViews.setTextViewText(R.id.tv_city, resultsBean.currentCity);
           }
@@ -423,7 +429,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
             } else {
               index = date.lastIndexOf("时");
             }
-            curTemperature = date.substring(index + 1, date.length() - 1).replace("℃", "°");
+            curTemperature = date.substring(index + 1, date.length() - 1).replace("℃", "");
             tv_current_temperature.setText(curTemperature);
           } else {
             tv_current_temperature.setText("未获取到数据");
@@ -455,6 +461,25 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
         getWeather();
         break;
     }
+  }
+
+  @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+      DialogUtils.getInstance(this).showDefault("温馨提示", "真的要离开114天气么，小4会想你的哦。。。", "残忍离开", "我再看看", new DialogUtils.buttonLinstener() {
+        @Override public void onNegativeClick() {
+
+        }
+
+        @Override public void onPositiveClick() {
+          WeatherApplication.getInstance().exitApp();
+        }
+
+        @Override public void onNeutralClick() {
+
+        }
+      });
+    }
+    return super.onKeyDown(keyCode, event);
   }
 
   @Override protected void onResume() {

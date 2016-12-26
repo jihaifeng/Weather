@@ -50,8 +50,6 @@ public class ChooseAreaFragment extends Fragment {
 
   private static final String TAG = "ChooseAreaFragment";
 
-  public static final int LEVEL_DEFAULT = 0;
-
   public static final int LEVEL_PROVINCE = 1;
 
   public static final int LEVEL_CITY = 2;
@@ -105,7 +103,7 @@ public class ChooseAreaFragment extends Fragment {
   /**
    * 当前选中的级别
    */
-  private int currentLevel = LEVEL_DEFAULT;
+  private int currentLevel = LEVEL_PROVINCE;
 
   private String strLocation = "定位中。。。";
 
@@ -148,11 +146,11 @@ public class ChooseAreaFragment extends Fragment {
     sf_area.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override public void onRefresh() {
         getLocationAddr();
-        if (currentLevel == LEVEL_DEFAULT) {
+        if (currentLevel == LEVEL_PROVINCE) {
           queryProvinces();
-        } else if (currentLevel == LEVEL_PROVINCE) {
-          queryCities();
         } else if (currentLevel == LEVEL_CITY) {
+          queryCities();
+        } else if (currentLevel == LEVEL_COUNTY) {
           queryCounties();
         }
       }
@@ -275,6 +273,10 @@ public class ChooseAreaFragment extends Fragment {
    * 查询选中省内所有的市，优先从数据库查询，如果没有查询到再去服务器上查询。
    */
   private void queryCities() {
+    if (null == selectedProvince) {
+      ToastUtil.showShort(getActivity(), "数据异常").show();
+      return;
+    }
     titleText.setText(selectedProvince.getProvinceName());
     rl_back.setVisibility(View.VISIBLE);
     cityList = DataSupport.where("provinceid = ?", String.valueOf(selectedProvince.getId())).find(City.class);
@@ -300,6 +302,10 @@ public class ChooseAreaFragment extends Fragment {
    * 查询选中市内所有的县，优先从数据库查询，如果没有查询到再去服务器上查询。
    */
   private void queryCounties() {
+    if (null == selectedCity) {
+      ToastUtil.showShort(getActivity(), "数据异常").show();
+      return;
+    }
     titleText.setText(selectedCity.getCityName());
     rl_back.setVisibility(View.VISIBLE);
     countyList = DataSupport.where("cityid = ?", String.valueOf(selectedCity.getId())).find(County.class);

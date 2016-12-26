@@ -29,9 +29,6 @@ public class AreaPickActivity extends BaseActivity {
     CustomStatusBar.setTranslucent(this, Color.TRANSPARENT, false, toolbar);
   }
 
-
-
-
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     if (requestCode == PermissionConfig.PERMISSION_LOCATION) {
       if (grantResults.length > 0) {

@@ -32,7 +32,8 @@ public class WelcomeActivity extends BaseActivity {
   private ImageView welcomePic;
   private Timer timer = new Timer();
   private TextView tv_time;
-  public static int time = 10;
+  public static int Guide_Time = 3;
+  public static int time;
   private MyTimerTask mTimerTask;
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,11 +48,11 @@ public class WelcomeActivity extends BaseActivity {
   class MyTimerTask extends TimerTask {
     @Override public void run() {
       time--;
-      updateText(time);
       if (timer != null) {
         timer.cancel();
       }
       if (time != 0) {
+        updateText(time);
         timer = new Timer();
         timer.schedule(new MyTimerTask(), 1000);
       } else {
@@ -61,7 +62,12 @@ public class WelcomeActivity extends BaseActivity {
     }
   }
 
-  ;
+  @Override protected void onDestroy() {
+    super.onDestroy();
+    if (null != timer) {
+      timer.cancel();
+    }
+  }
 
   private void updateText(int t) {
     runOnUiThread(new Runnable() {
@@ -90,6 +96,7 @@ public class WelcomeActivity extends BaseActivity {
       Glide.with(WelcomeActivity.this).load(response).placeholder(R.drawable.timg).diskCacheStrategy(DiskCacheStrategy.ALL).into(welcomePic);
       setSharedPreferences(Config.WELCOM_PIC, response);
     }
+    time = Guide_Time;
     updateText(time);
     timer.schedule(new MyTimerTask(), 1000);
   }

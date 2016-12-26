@@ -40,11 +40,26 @@ public abstract class WeatherUtils {
           weatherLinstener.showError("数据返回出错，请稍后重试");
           return;
         }
+        BaseDataDb.insert(Config.CURRENT_WEATHER_DATA, response);
         weatherLinstener.showData(weatherBase.results);
       }
 
       @Override public void onFailure(String msg, Throwable e) {
         ProgressUtils.hideProgressDialog();
+        List<BaseDataDb> baseDataDb = BaseDataDb.get(Config.CURRENT_WEATHER_DATA);
+        if (null != baseDataDb && baseDataDb.size() != 0 && null != baseDataDb.get(0)) {
+          String response = baseDataDb.get(0).value;
+          if (!TextUtils.isEmpty(response)) {
+            WeatherBase weatherBase = new Gson().fromJson(response, WeatherBase.class);
+            if (null == weatherBase) {
+              weatherLinstener.showError("数据返回出错，请稍后重试");
+              return;
+            }
+            weatherLinstener.showData(weatherBase.results);
+            ToastUtil.showShort(context, msg).show();
+            return;
+          }
+        }
         weatherLinstener.showError(msg);
       }
     });

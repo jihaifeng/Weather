@@ -184,6 +184,10 @@ public class CityManagerActivity extends BaseActivity {
     pullDown = false;
   }
 
+  @Override protected void onPostCreate(Bundle savedInstanceState) {
+    super.onPostCreate(savedInstanceState);
+  }
+
   @Override protected void onDestroy() {
     super.onDestroy();
     pullDown = false;
