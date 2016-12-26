@@ -219,7 +219,7 @@ public abstract class WeatherUtils {
   }
 
   public static int getWeatherBg(String desc) {
-    int drawableId = R.drawable.timg;
+    int drawableId = R.drawable.weather_general_bg;
     if (TextUtils.isEmpty(desc)) {
       return drawableId;
     }
@@ -233,7 +233,7 @@ public abstract class WeatherUtils {
       }
       if (desc.contains("阴") || desc.contains("多云")) {
         //阴天，多云
-        drawableId = R.drawable.timg;
+        drawableId = R.drawable.weather_night_cloud;
       }
       if (desc.contains("雨")) {
         //雨天
@@ -248,7 +248,8 @@ public abstract class WeatherUtils {
         drawableId = R.drawable.weather_day_fog;
       }
       if (desc.contains("雷阵雨")) {
-        drawableId = R.drawable.weather_day_thunderstorm;
+        //雷阵雨
+        drawableId = R.drawable.weather_general_thunderstorm;
       }
     } else {
       //夜
@@ -258,7 +259,7 @@ public abstract class WeatherUtils {
       }
       if (desc.contains("阴") || desc.contains("多云")) {
         //阴天，多云
-        drawableId = R.drawable.timg;
+        drawableId = R.drawable.weather_night_cloud;
       }
       if (desc.contains("雨")) {
         //雨天
@@ -273,7 +274,7 @@ public abstract class WeatherUtils {
         drawableId = R.drawable.weather_night_fog;
       }
       if (desc.contains("雷阵雨")) {
-        drawableId = R.drawable.weather_day_thunderstorm;
+        drawableId = R.drawable.weather_general_thunderstorm;
       }
     }
     if (desc.contains("霾")) {
@@ -282,23 +283,23 @@ public abstract class WeatherUtils {
     }
     if (desc.contains("雨夹雪")) {
       //雨夹雪
-      drawableId = R.drawable.timg;
-    }
-    if (desc.contains("冰雹")) {
-      //冰雹
-      drawableId = R.drawable.timg;
-    }
-    if (desc.contains("彩虹")) {
-      //彩虹
-      drawableId = R.drawable.timg;
+      drawableId = R.drawable.weather_general_sleet;
     }
     if (desc.contains("沙尘暴")) {
       //沙尘暴天
-      drawableId = R.drawable.timg;
+      drawableId = R.drawable.weather_general_duststorms;
     }
     if (desc.contains("龙卷风")) {
       //龙卷风
-      drawableId = R.drawable.timg;
+      //drawableId = R.drawable.timg;
+    }
+    if (desc.contains("冰雹")) {
+      //冰雹
+      //drawableId = R.drawable.timg;
+    }
+    if (desc.contains("彩虹")) {
+      //彩虹
+      drawableId = R.drawable.weather_day_sun;
     }
     return drawableId;
   }
