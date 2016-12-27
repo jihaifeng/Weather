@@ -30,7 +30,7 @@
   <application
       android:name=".WeatherApplication"
       android:allowBackup="true"
-      android:icon="@mipmap/ic_launcher"
+      android:icon="@mipmap/weather_launcher"
       android:label="@string/app_name"
       android:supportsRtl="true"
       android:theme="@style/AppTheme"
@@ -81,7 +81,7 @@
     <!-- 渠道商编号 -->
     <meta-data
         android:name="BaiduMobAd_CHANNEL"
-        android:value="baiduWeather"
+        android:value="Tweather "
         />
 
     <!-- 是否开启错误日志统计，默认为false -->

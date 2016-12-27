@@ -300,7 +300,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
     NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
     //设置通知小ICON,一定要设置，不能少
-    builder.setSmallIcon(R.mipmap.ic_launcher);
+    builder.setSmallIcon(R.mipmap.weather_launcher);
     Intent intent = new Intent(this, WeatherActivity.class);
     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_CANCEL_CURRENT);
     builder.setContentIntent(pendingIntent);
@@ -446,6 +446,7 @@ public class WeatherActivity extends BaseActivity implements SwipeRefreshLayout.
           tv_current_pm25.setText("PM2.5  " + resultsBean.pm25);
         }
         Glide.with(WeatherActivity.this).load(WeatherUtils.getWeatherBg(desc)).diskCacheStrategy(DiskCacheStrategy.ALL).into(iv_weather_bg);
+        //Glide.with(WeatherActivity.this).load(R.drawable.thunderrain).diskCacheStrategy(DiskCacheStrategy.ALL).into(iv_weather_bg);
       }
     }
   }

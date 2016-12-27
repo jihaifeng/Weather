@@ -91,9 +91,9 @@ public class WelcomeActivity extends BaseActivity {
 
   private void updateWelComePic(String response) {
     if (TextUtils.isEmpty(response)) {
-      Glide.with(WelcomeActivity.this).load(R.drawable.timg).into(welcomePic);
+      Glide.with(WelcomeActivity.this).load(R.drawable.pic_welcome).into(welcomePic);
     } else {
-      Glide.with(WelcomeActivity.this).load(response).placeholder(R.drawable.timg).diskCacheStrategy(DiskCacheStrategy.ALL).into(welcomePic);
+      Glide.with(WelcomeActivity.this).load(response).placeholder(R.drawable.pic_welcome).diskCacheStrategy(DiskCacheStrategy.ALL).into(welcomePic);
       setSharedPreferences(Config.WELCOM_PIC, response);
     }
     time = Guide_Time;

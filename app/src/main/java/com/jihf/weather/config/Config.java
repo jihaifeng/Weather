@@ -8,7 +8,7 @@ package com.jihf.weather.config;
  * Mail：jihaifeng@raiyi.com
  */
 public class Config {
-  public static final String TONGJI_CHANNEL = "BaiduMobAd_CHANNEL";
+  public static final String TONGJI_CHANNEL = "Tweather";
   public static final String JUHE_KEY = "25c32e75bce37c7a76d5a12b98b38fbe";
   public static final String BAIDU_WEATHER_AK = "7ijwY8TLZEW57f8dUGfkcNp3QaC2nQqc";
   public static final String BAIDU_WEATHER_MCODE = "8D:B2:2E:75:62:11:E8:B0:AD:34:D7:4E:EF:95:C5:91:3D:ED:B2:0D;com.jihf.weather";

@@ -303,4 +303,5 @@ public abstract class WeatherUtils {
     }
     return drawableId;
   }
+
 }
